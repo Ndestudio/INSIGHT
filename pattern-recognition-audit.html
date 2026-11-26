@@ -1,0 +1,610 @@
+<title>Pattern Recognition in Internal Audit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,500;1,700&display=swap">
+<style>
+/* Layout: IAS Brand Guideline, "digital command center" — one deliberate dark look built on Navy #1D2250, Tosca #04B0C0 glow, Abu-abu #D1D3D4 hairlines; glass panels over a starfield grid; Montserrat untuk semua teks */
+:root{
+  --brand-navy:#1D2250; --brand-tosca:#04B0C0; --brand-grey:#D1D3D4;
+  --bg:#060A22; --surface:rgba(22,27,72,.62); --surface-solid:#12173F; --sunk:rgba(209,211,212,.05); --ink:#E9ECF8; --muted:#9BA4C9; --line:rgba(209,211,212,.13);
+  --navy:#1D2250; --navy-ink:#FFFFFF; --mast-glow:#077D93; --accent:#04B0C0; --on-accent:#06102A;
+  --amber:#04B0C0; --amber-soft:rgba(4,176,192,.13); --tosca-ink:#3FD3E0; --glow:rgba(4,176,192,.35);
+  --high:#FF6B5E; --med:#F5A93B; --low:#5FB6E0; --ok:#4FD39A;
+  --c1:#8F9BFF; --c2:#2CC8D6; --c3:#F5A93B; --expect:#D1D3D4;
+  color-scheme:dark;
+  --f-display:"Montserrat",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:"Montserrat",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Montserrat",ui-sans-serif,system-ui,sans-serif;
+  --f-code:ui-monospace,"Cascadia Mono",Consolas,monospace;
+  --r:10px;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.2}
+.num,.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+
+.mast{background:radial-gradient(120% 220% at 85% 140%,var(--mast-glow) 0%,var(--navy) 62%);color:var(--navy-ink);border-bottom:4px solid var(--brand-tosca);margin-top:calc(-1 * env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px)}
+.mast-in{max-width:1320px;margin:0 auto;padding-block:18px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:12px;align-items:center;min-width:0}
+.brand{flex-wrap:wrap;gap:12px 18px}
+.logo-plate{flex:none;background:#FFFFFF;border-radius:8px;padding:8px 12px;display:flex;align-items:center;box-shadow:0 1px 0 rgba(0,0,0,.15)}
+.logo-plate img{display:block;height:40px;width:auto}
+.brand-txt{min-width:0;border-left:3px solid var(--brand-tosca);padding-left:16px}
+@media (max-width:520px){.brand-txt{border-left:0;padding-left:0}.logo-plate img{height:34px}}
+.brand h1{font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
+.brand .eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--brand-tosca);margin:0 0 2px}
+.brand p{margin:2px 0 0;font-size:.84rem;font-style:italic;font-weight:500;opacity:.92}
+.brand mark{background:var(--brand-tosca);color:var(--brand-navy);padding:0 4px;border-radius:2px;font-weight:700}
+.src{font-size:.8rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:5px 12px;max-width:100%}
+
+.shell{max-width:1320px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;grid-template-columns:210px minmax(0,1fr);gap:24px;align-items:start}
+nav.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:flex;flex-direction:column;gap:2px}
+.rail .lbl{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:10px 12px 4px}
+.rail a{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px 12px;border-radius:8px;color:var(--ink);text-decoration:none;font-weight:500}
+.rail a:hover{background:var(--surface)}
+.rail a[aria-current="page"]{background:var(--surface);box-shadow:inset 3px 0 0 var(--amber);font-weight:600}
+.rail .cnt{font-family:var(--f-mono);font-size:.75rem;color:var(--muted)}
+@media (max-width:900px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  nav.rail{position:static;flex-direction:row;overflow-x:auto;gap:4px;padding-bottom:4px}
+  .rail .lbl{display:none}
+  .rail a{white-space:nowrap;background:var(--surface);border:1px solid var(--line)}
+  .rail a[aria-current="page"]{box-shadow:inset 0 -3px 0 var(--amber)}
+}
+main{min-width:0}
+section.view{display:flex;flex-direction:column;gap:18px}
+.vh{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:10px}
+.vh h2{font-size:1.5rem}
+.vh p{margin:4px 0 0;color:var(--muted);max-width:68ch}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr))}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;min-width:0}
+.panel h3{font-size:1rem;margin-bottom:4px}
+.panel .sub{color:var(--muted);font-size:.84rem;margin:0 0 14px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.kpi .k{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.kpi .v{font-family:var(--f-display);font-size:1.6rem;font-weight:600;margin-top:4px;font-variant-numeric:tabular-nums}
+.kpi .d{font-size:.8rem;color:var(--muted)}
+.kpi.alert{border-color:color-mix(in srgb,var(--high) 45%,var(--line))}
+.kpi.alert .v{color:var(--high)}
+
+.hbar{display:grid;grid-template-columns:minmax(0,170px) minmax(0,1fr) 44px;gap:6px 10px;align-items:center;font-size:.85rem}
+.hbar .track{height:12px;background:var(--sunk);border-radius:3px;overflow:hidden}
+.hbar .fill{height:100%;border-radius:3px}
+.hbar .n{font-family:var(--f-mono);text-align:right}
+.hbar .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.tl{display:flex;align-items:flex-end;gap:3px;height:170px;border-bottom:1px solid var(--line);position:relative}
+.tl .col{flex:1;display:flex;flex-direction:column-reverse;height:100%;min-width:0;cursor:default}
+.tl .col span{display:block;width:100%}
+.tl .col .nf{background:color-mix(in srgb,var(--accent) 28%,var(--sunk))}
+.tl .col .fl{background:var(--high)}
+.tl .col.we .nf{background:color-mix(in srgb,var(--muted) 22%,var(--sunk))}
+.tl-x{display:flex;gap:3px;font-size:.7rem;color:var(--muted);font-family:var(--f-mono)}
+.tl-x span{flex:1;text-align:center;min-width:0}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.78rem;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+
+.seg{display:flex;height:16px;border-radius:4px;overflow:hidden;background:var(--sunk)}
+.seg span{height:100%}
+
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--sunk);font-weight:600;position:sticky;top:0}
+td.r,th.r{text-align:right}
+tbody tr:last-child td{border-bottom:0}
+tr.hit td{background:var(--amber-soft)}
+tr.clk{cursor:pointer}
+tr.clk:hover td{background:var(--sunk)}
+tr.det td{background:var(--sunk);white-space:normal}
+.notes{display:grid;gap:6px;padding:4px 0}
+.notes div{display:flex;gap:10px;align-items:baseline}
+
+.pill{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:.78rem;padding:2px 8px;border-radius:999px;font-family:var(--f-mono)}
+.pill.T{background:color-mix(in srgb,var(--high) 16%,transparent);color:var(--high)}
+.pill.S{background:color-mix(in srgb,var(--med) 18%,transparent);color:var(--med)}
+.pill.R{background:color-mix(in srgb,var(--low) 18%,transparent);color:var(--low)}
+.chip{display:inline-block;font-size:.72rem;padding:1px 7px;border-radius:4px;border:1px solid;margin:1px 3px 1px 0;white-space:nowrap}
+.chip.Transaction{color:var(--c1);border-color:color-mix(in srgb,var(--c1) 40%,transparent)}
+.chip.Behavioral{color:var(--c2);border-color:color-mix(in srgb,var(--c2) 40%,transparent)}
+.chip.Anomaly{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,transparent)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);padding:7px 14px;border-radius:8px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
+.btn.pri:hover{border-color:var(--amber);box-shadow:inset 0 -3px 0 var(--amber)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.field{display:flex;flex-direction:column;gap:4px;font-size:.82rem;color:var(--muted);min-width:0}
+.field input,.field select,.inp{background:var(--sunk);border:1px solid var(--line);border-radius:7px;padding:7px 10px;color:var(--ink);min-width:0}
+textarea{width:100%;min-height:130px;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:10px;font-family:var(--f-code);font-size:.8rem;resize:vertical}
+pre.code{font-family:var(--f-code);background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:12px;overflow-x:auto;font-size:.78rem;margin:0}
+.params{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px}
+.rule{display:grid;grid-template-columns:auto minmax(0,1fr) 80px 56px;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.rule:last-child{border-bottom:0}
+.rule .t{font-weight:600}
+.rule .ds{font-size:.8rem;color:var(--muted)}
+.rule input[type=number]{width:100%}
+.rule input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}
+.note{border-left:3px solid var(--amber);background:var(--amber-soft);padding:12px 14px;border-radius:0 8px 8px 0;font-size:.88rem}
+.note b{font-family:var(--f-display)}
+.msg{font-size:.85rem;padding:8px 12px;border-radius:7px}
+.msg.err{background:color-mix(in srgb,var(--high) 14%,transparent);color:var(--high)}
+.msg.ok{background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ok)}
+
+.case{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px}
+@media (max-width:720px){.case{grid-template-columns:minmax(0,1fr)}}
+.found{border:1px solid color-mix(in srgb,var(--high) 40%,var(--line));border-radius:8px;padding:12px 14px}
+.found h4{margin:0 0 8px;color:var(--high);font-family:var(--f-display)}
+.found ul{margin:0;padding-left:18px}
+.found .ind{margin-top:10px;font-size:.85rem}
+.found .ind mark{background:var(--brand-tosca);color:var(--brand-navy);font-weight:600;padding:0 4px;border-radius:2px}
+
+.benf{display:flex;gap:10px;align-items:flex-end;height:220px;border-bottom:1px solid var(--line);padding-top:16px}
+.benf .d{flex:1;height:100%;position:relative;display:flex;align-items:flex-end;justify-content:center}
+.benf .o{width:62%;background:var(--accent);border-radius:3px 3px 0 0}
+.benf .o.z{background:var(--high)}
+.benf .e{position:absolute;left:8%;right:8%;border-top:2px dashed var(--expect)}
+.vh h2{font-weight:800}
+.vh h2::after{content:"";display:block;width:44px;height:4px;background:var(--brand-tosca);margin-top:8px;border-radius:2px}
+.panel h3{font-weight:700}
+.kpi .v{font-weight:700;font-size:1.4rem;white-space:nowrap}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(min(100%,185px),1fr))}
+a.btn{text-decoration:none}
+.benf .lab{position:absolute;top:-16px;font-size:.7rem;font-family:var(--f-mono);color:var(--muted)}
+.benf-x{display:flex;gap:10px;font-family:var(--f-mono);font-size:.8rem;color:var(--muted)}
+.benf-x span{flex:1;text-align:center}
+
+.hm td.c{text-align:center;font-family:var(--f-mono);min-width:44px}
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:12px}
+.flow .st{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--sunk);position:relative}
+.flow .st.ai{border-color:var(--c2);background:color-mix(in srgb,var(--c2) 10%,var(--surface))}
+.flow .st h4{margin:0 0 6px;font-family:var(--f-display);font-size:.92rem}
+.flow .st ul{margin:0;padding-left:16px;font-size:.82rem;color:var(--muted)}
+.tag{font-size:.7rem;font-weight:600;padding:1px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.05em}
+.tag.on{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.tag.part{background:color-mix(in srgb,var(--med) 16%,transparent);color:var(--med)}
+.tag.off{background:var(--sunk);color:var(--muted)}
+.muted{color:var(--muted)}
+.small{font-size:.8rem}
+@media (prefers-reduced-motion:no-preference){.panel,.kpi{transition:border-color .2s,box-shadow .2s}}
+
+/* ===== Digital technology layer ===== */
+body{background:
+  radial-gradient(900px 520px at 100% 0%,rgba(4,176,192,.10),transparent 60%),
+  radial-gradient(900px 700px at 0% 100%,rgba(29,34,80,.95),transparent 65%),
+  linear-gradient(rgba(209,211,212,.035) 1px,transparent 1px) 0 0/44px 44px,
+  linear-gradient(90deg,rgba(209,211,212,.035) 1px,transparent 1px) 0 0/44px 44px,
+  var(--bg);background-attachment:fixed}
+
+.mast{margin-top:0;padding-top:0;position:relative;border-bottom:1px solid rgba(4,176,192,.55);box-shadow:0 1px 24px rgba(4,176,192,.25);
+  overflow:hidden;background:radial-gradient(640px 420px at 76% 50%,rgba(4,176,192,.14),transparent 70%),#060A22}
+.globe{position:absolute;right:-6%;top:50%;transform:translateY(-50%);width:min(900px,72%);aspect-ratio:16/9;background:url("hero-globe.jpg") center/cover no-repeat;
+  -webkit-mask-image:radial-gradient(closest-side,#000 62%,transparent 100%);mask-image:radial-gradient(closest-side,#000 62%,transparent 100%);pointer-events:none}
+@media (prefers-reduced-motion:no-preference){.globe{animation:drift 14s ease-in-out infinite alternate}@keyframes drift{from{transform:translateY(-50%) scale(1)}to{transform:translateY(-52%) scale(1.04)}}}
+.mast-in{position:relative;z-index:1;display:flex;flex-direction:column;align-items:stretch;gap:28px;padding-block:18px 34px}
+.topbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
+.logo-plate{background:none;padding:0;border-radius:0;box-shadow:none}
+.logo-plate img{height:46px;filter:drop-shadow(0 0 14px rgba(4,176,192,.35))}
+@media (max-width:520px){.logo-plate img{height:38px}}
+.sys{display:flex;align-items:center;gap:8px;font-size:.74rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tosca-ink);background:rgba(4,176,192,.08);border:1px solid rgba(4,176,192,.35);border-radius:999px;padding:6px 12px}
+.live{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(79,211,154,.6)}
+@media (prefers-reduced-motion:no-preference){.live{animation:pulse 2s infinite}@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(79,211,154,.6)}70%{box-shadow:0 0 0 9px rgba(79,211,154,0)}100%{box-shadow:0 0 0 0 rgba(79,211,154,0)}}}
+.hero{max-width:640px;display:flex;flex-direction:column;gap:12px}
+.hero .eyebrow{font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-tosca)}
+.hero h1{font-size:clamp(1.8rem,4.2vw,3rem);font-weight:800;line-height:1.08;letter-spacing:-.015em;color:#fff}
+.hero h1 span{color:var(--brand-tosca);font-style:italic;font-weight:700;text-shadow:0 0 24px rgba(4,176,192,.45)}
+.hero p{margin:0;font-size:1rem;font-weight:500;color:#C9D0EA}
+.hero mark{background:var(--brand-tosca);color:var(--brand-navy);padding:0 5px;border-radius:3px;font-weight:700}
+.caps{display:flex;flex-wrap:wrap;gap:6px}
+.caps span{font-size:.72rem;font-weight:600;padding:4px 10px;border-radius:4px;color:#DCE3F7;background:rgba(29,34,80,.7);border:1px solid rgba(209,211,212,.18);backdrop-filter:blur(6px)}
+.hero .src{align-self:flex-start;font-size:.78rem;color:#C9D0EA;background:rgba(6,10,34,.6);border:1px solid rgba(209,211,212,.2)}
+@media (max-width:700px){.globe{width:150%;right:-55%;opacity:.5}}
+
+.panel,.kpi{background:var(--surface);border-color:var(--line);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 12px 32px rgba(0,0,0,.28)}
+.panel:hover{border-color:rgba(4,176,192,.35)}
+.kpi{position:relative}
+.kpi::before,.kpi::after{content:"";position:absolute;width:14px;height:14px;pointer-events:none}
+.kpi::before{top:-1px;left:-1px;border-top:2px solid var(--brand-tosca);border-left:2px solid var(--brand-tosca);border-top-left-radius:var(--r)}
+.kpi::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--brand-tosca);border-right:2px solid var(--brand-tosca);border-bottom-right-radius:var(--r)}
+.kpi .k{color:var(--tosca-ink);font-weight:600}
+.kpi .v{color:#fff;text-shadow:0 0 18px rgba(4,176,192,.35)}
+.kpi.alert{border-color:rgba(255,107,94,.45)}
+.kpi.alert::before,.kpi.alert::after{border-color:var(--high)}
+.kpi.alert .v{color:var(--high);text-shadow:0 0 18px rgba(255,107,94,.4)}
+
+.rail a{color:var(--ink)}
+.rail a:hover{background:rgba(4,176,192,.08)}
+.rail a[aria-current="page"]{background:linear-gradient(90deg,rgba(4,176,192,.22),rgba(4,176,192,.02));box-shadow:inset 3px 0 0 var(--brand-tosca);color:#fff}
+.rail .lbl{color:var(--tosca-ink)}
+@media (max-width:900px){.rail a{background:var(--surface);border-color:var(--line)}.rail a[aria-current="page"]{box-shadow:inset 0 -3px 0 var(--brand-tosca)}}
+
+.vh h2{color:#fff}
+.vh h2::after{box-shadow:0 0 12px var(--glow)}
+.tw{background:rgba(6,10,34,.35);border-color:var(--line)}
+th{background:var(--surface-solid);color:var(--tosca-ink)}
+tr.clk:hover td{background:rgba(4,176,192,.07)}
+tr.hit td{background:rgba(4,176,192,.11)}
+tr.det td{background:rgba(6,10,34,.55)}
+.field input,.field select,.inp,textarea{background:rgba(6,10,34,.6);border-color:rgba(209,211,212,.18)}
+.field input:focus,.field select:focus,.inp:focus,textarea:focus{border-color:var(--brand-tosca);outline:none;box-shadow:0 0 0 3px rgba(4,176,192,.2)}
+pre.code{background:rgba(6,10,34,.6)}
+
+.btn{background:rgba(209,211,212,.05);border-color:rgba(209,211,212,.2)}
+.btn:hover{border-color:var(--brand-tosca);box-shadow:0 0 14px rgba(4,176,192,.25)}
+.btn.pri{background:linear-gradient(90deg,#04B0C0,#12CCDC);border-color:transparent;color:var(--on-accent);font-weight:700;box-shadow:0 0 20px rgba(4,176,192,.35)}
+.btn.pri:hover{box-shadow:0 0 28px rgba(4,176,192,.55)}
+
+.hbar .track{background:rgba(209,211,212,.07)}
+.hbar .fill{box-shadow:0 0 10px rgba(4,176,192,.25)}
+.tl .col .nf{background:linear-gradient(to top,rgba(4,176,192,.18),rgba(4,176,192,.45))}
+.tl .col.we .nf{background:rgba(209,211,212,.12)}
+.tl .col .fl{background:linear-gradient(to top,#C8372D,#FF6B5E);box-shadow:0 0 10px rgba(255,107,94,.4)}
+.seg{background:rgba(209,211,212,.07)}
+.benf .o{background:linear-gradient(to top,rgba(4,176,192,.35),#04B0C0);box-shadow:0 0 14px rgba(4,176,192,.3)}
+.benf .o.z{background:linear-gradient(to top,rgba(255,107,94,.35),#FF6B5E);box-shadow:0 0 14px rgba(255,107,94,.35)}
+.flow .st{background:rgba(6,10,34,.45);border-color:var(--line)}
+.flow .st.ai{background:rgba(4,176,192,.08);border-color:rgba(4,176,192,.5);box-shadow:0 0 18px rgba(4,176,192,.15)}
+.note{background:rgba(4,176,192,.09);border-left-color:var(--brand-tosca)}
+.note b{color:var(--tosca-ink)}
+.found{background:rgba(255,107,94,.05)}
+</style>
+
+<header class="mast">
+  <div class="globe" aria-hidden="true"></div>
+  <div class="mast-in">
+    <div class="topbar">
+      <div class="logo-plate"><img src="ias-logo-white.png" alt="InJourney Aviation Services" width="175" height="46"></div>
+      <div class="sys"><span class="live" aria-hidden="true"></span>Audit Intelligence Engine · <span id="engState">aktif</span></div>
+    </div>
+    <div class="hero">
+      <div class="eyebrow">Internal Audit · Continuous Auditing</div>
+      <h1>Pattern Recognition<br><span>in Internal Audit</span></h1>
+      <p>Menemukan pola, <mark>mengungkap risiko</mark>, mencegah fraud lebih dini.</p>
+      <div class="caps"><span>Rule-Based Detection</span><span>Benford's Law</span><span>Robust Z-Score</span><span>Relationship Analytics</span><span>Risk Scoring</span></div>
+      <div class="src" id="srcLabel">Memuat…</div>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" id="rail" aria-label="Menu">
+    <div class="lbl">Analisis</div>
+    <a href="#ringkasan">Ringkasan</a>
+    <a href="#temuan">Temuan <span class="cnt" id="cntTemuan"></span></a>
+    <a href="#benford">Benford's Law</a>
+    <a href="#relasi">Relasi &amp; Perilaku</a>
+    <div class="lbl">Pengaturan</div>
+    <a href="#data">Sumber Data <span class="cnt" id="cntData"></span></a>
+    <a href="#mesin">Mesin Deteksi</a>
+    <a href="#panduan">Arsitektur &amp; Panduan</a>
+  </nav>
+  <main id="main"></main>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rp=n=>'Rp'+Math.round(n).toLocaleString('id-ID');
+const rps=n=>{const a=Math.abs(n);if(a>=1e12)return 'Rp'+(n/1e12).toFixed(2).replace('.',',')+' T';if(a>=1e9)return 'Rp'+(n/1e9).toFixed(2).replace('.',',')+' M';if(a>=1e6)return 'Rp'+(n/1e6).toFixed(1).replace('.',',')+' jt';return rp(n)};
+const pct=(a,b)=>b?(100*a/b).toFixed(1).replace('.',',')+'%':'0%';
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const HARI=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+const dow=d=>new Date(d+'T00:00:00Z').getUTCDay();
+const dayDiff=(a,b)=>Math.round(Math.abs(Date.parse(a.date)-Date.parse(b.date))/864e5);
+const fdate=d=>{const [y,m,dd]=d.split('-');return `${HARI[dow(d)]}, ${+dd}/${+m}/${y}`};
+
+/* ---------- Rules ---------- */
+const GROUPS={Transaction:{label:'Transaction Pattern',c:'var(--c1)'},Behavioral:{label:'Behavioral Pattern',c:'var(--c2)'},Anomaly:{label:'Anomaly Pattern',c:'var(--c3)'}};
+const RULES=[
+ {id:'DUP',g:'Transaction',name:'Duplicate payment',w:35,desc:'Vendor dan nominal identik dalam jendela waktu tertentu'},
+ {id:'SPLIT',g:'Transaction',name:'Split transaction',w:30,desc:'Beberapa transaksi di bawah batas otorisasi oleh pembuat yang sama ke vendor yang sama (masing-masing cukup besar), totalnya melewati batas'},
+ {id:'NEAR',g:'Transaction',name:'Mendekati batas otorisasi',w:15,desc:'Nominal sedikit di bawah batas persetujuan'},
+ {id:'ROUND',g:'Transaction',name:'Round amount',w:10,desc:'Nominal bulat (kelipatan tertentu)'},
+ {id:'WKND',g:'Transaction',name:'Weekend transaction',w:15,desc:'Dicatat pada hari Sabtu atau Minggu'},
+ {id:'HRS',g:'Behavioral',name:'Di luar jam kerja',w:15,desc:'Waktu input di luar jam operasional'},
+ {id:'SOD',g:'Behavioral',name:'Pembuat = penyetuju',w:30,desc:'Pelanggaran segregation of duties (maker = checker)'},
+ {id:'FAV',g:'Behavioral',name:'Vendor favorit',w:10,desc:'Transaksi seorang pembuat terkonsentrasi ke satu vendor'},
+ {id:'OUT',g:'Anomaly',name:'Outlier nominal',w:25,desc:'Robust z-score (median & MAD log-nominal) per kategori'}
+];
+const RULE=Object.fromEntries(RULES.map(r=>[r.id,r]));
+const DEF={threshold:50000000,dupDays:3,splitDays:0,splitMinPct:35,nearPct:90,roundMod:5000000,roundMin:10000000,hStart:7,hEnd:19,favPct:60,favMin:5,zThr:3.5,
+  on:Object.fromEntries(RULES.map(r=>[r.id,true])),w:Object.fromEntries(RULES.map(r=>[r.id,r.w]))};
+let cfg=Object.assign({},DEF,store.get('pr-cfg',{}));cfg.on=Object.assign({},DEF.on,cfg.on||{});cfg.w=Object.assign({},DEF.w,cfg.w||{});
+
+/* ---------- Sample data (fiktif) ---------- */
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function sample(){
+  const r=rng(20261126);
+  const V=[['PT Sinar Abadi','Pengadaan'],['CV Maju Jaya','Pemeliharaan'],['PT Data Prima','Jasa IT'],['PT Karya Mandiri','Pengadaan'],['CV Berkah Sentosa','ATK'],['PT Logistik Nusantara','Logistik'],['PT Teknologi Andalan','Jasa IT'],['CV Mitra Usaha','Pemeliharaan'],['PT Global Supplies','ATK'],['PT Wira Konsultindo','Konsultan']];
+  const CEN={'Pengadaan':7.4,'Jasa IT':7.6,'Logistik':7.2,'ATK':6.4,'Konsultan':7.8,'Pemeliharaan':6.9};
+  const DESC={'Pengadaan':'Pembelian material','Jasa IT':'Jasa pengembangan sistem','Logistik':'Biaya pengiriman','ATK':'Pembelian ATK','Konsultan':'Jasa konsultan','Pemeliharaan':'Pemeliharaan gedung'};
+  const U=['ANDI','BUDI','CITRA','DEWI','EKO'],A=['RINA','HADI'];
+  const wd=[];for(let d=1;d<=30;d++){const s='2026-11-'+String(d).padStart(2,'0');if(dow(s)%6)wd.push(s)}
+  const pick=a=>a[Math.floor(r()*a.length)];
+  const tx=[];
+  for(let i=0;i<265;i++){
+    const u=pick(['ANDI','ANDI','BUDI','BUDI','CITRA','CITRA','DEWI','EKO','EKO']);let v=pick(V);
+    if(u==='DEWI'&&r()<.72)v=V[2];
+    const amt=Math.round(Math.pow(10,CEN[v[1]]+(r()-.5)*1.2)/1000)*1000;
+    const h=8+Math.floor(r()*9),m=Math.floor(r()*60);
+    tx.push({date:pick(wd),time:`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`,vendor:v[0],amount:amt,maker:u,approver:pick(A),cat:v[1],desc:DESC[v[1]]});
+  }
+  const add=(date,time,vi,amount,maker,approver,desc)=>tx.push({date:'2026-11-'+date,time,vendor:V[vi][0],amount,maker,approver,cat:V[vi][1],desc:desc||DESC[V[vi][1]]});
+  // Kasus ilustrasi: Vendor A berulang, nominal identik, waktu berdekatan
+  add('03','10:12',0,49000000,'BUDI','HADI');add('03','14:47',0,49000000,'BUDI','HADI');add('04','09:31',0,49000000,'BUDI','HADI');add('05','11:05',0,49000000,'BUDI','HADI');
+  add('04','13:20',3,15000000,'CITRA','RINA');
+  // Duplicate payment
+  add('10','10:02',6,37850000,'CITRA','RINA','Lisensi software Q4');add('12','15:40',6,37850000,'CITRA','RINA','Lisensi software Q4');
+  add('17','09:15',5,18425000,'ANDI','HADI','Pengiriman batch 112');add('17','16:22',5,18425000,'ANDI','HADI','Pengiriman batch 112');
+  add('23','11:11',1,8760000,'EKO','RINA');add('24','08:50',1,8760000,'EKO','RINA');
+  // Split transaction
+  add('19','09:05',7,24500000,'EKO','HADI','Perbaikan AC lantai 3');add('19','09:41',7,19800000,'EKO','HADI','Perbaikan AC lantai 3');add('19','10:16',7,22300000,'EKO','HADI','Perbaikan AC lantai 3');
+  // Round amount
+  add('25','14:00',9,150000000,'ANDI','RINA','Konsultan restrukturisasi');add('11','10:30',3,25000000,'BUDI','RINA');add('02','13:00',8,10000000,'CITRA','HADI','Pembelian ATK triwulan');
+  // Weekend & jam tidak wajar & SoD
+  add('08','21:40',8,12750000,'EKO','EKO','Pembelian ATK');add('21','10:05',2,41300000,'DEWI','RINA','Jasa pengembangan sistem');
+  add('13','02:15',4,4150000,'ANDI','HADI');add('26','23:05',6,47900000,'CITRA','RINA','Perpanjangan lisensi');
+  add('16','11:45',3,33000000,'BUDI','BUDI','Pembelian material');
+  // Outlier
+  add('27','15:10',5,1850000000,'ANDI','HADI','Biaya pengiriman proyek');add('18','10:20',4,145000000,'CITRA','RINA','Pembelian ATK');
+  tx.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  tx.forEach((t,i)=>t.id='TRX'+String(i+1).padStart(4,'0'));
+  return tx;
+}
+
+/* ---------- Detection engine ---------- */
+function groupBy(a,f){const m=new Map();for(const x of a){const k=f(x);if(!m.has(k))m.set(k,[]);m.get(k).push(x)}return m}
+const med=a=>{const s=[...a].sort((x,y)=>x-y),n=s.length;return n?(n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2):0};
+function detect(tx,c){
+  const F=new Map(tx.map(t=>[t.id,[]]));
+  const add=(t,r,note)=>{if(!c.on[r])return;const a=F.get(t.id);const ex=a.find(x=>x.r===r);if(ex){if(note&&!ex.note.includes(note)&&ex.note.length<160)ex.note+='; '+note}else a.push({r,note:note||''})};
+  const byD=(a,b)=>(a.date+a.time).localeCompare(b.date+b.time);
+  for(const arr of groupBy(tx,t=>t.vendor+'|'+t.amount).values()){if(arr.length<2)continue;arr.sort(byD);
+    for(let i=0;i<arr.length;i++)for(let j=i+1;j<arr.length;j++){const d=dayDiff(arr[i],arr[j]);if(d<=c.dupDays){add(arr[i],'DUP',`identik dengan ${arr[j].id}`);add(arr[j],'DUP',`identik dengan ${arr[i].id}`)}}}
+  for(const arr of groupBy(tx.filter(t=>t.amount<c.threshold&&t.amount>=c.threshold*c.splitMinPct/100),t=>t.vendor+'|'+t.maker).values()){if(arr.length<2)continue;arr.sort(byD);
+    for(let i=0;i<arr.length;i++){const w=[arr[i]];for(let j=i+1;j<arr.length&&dayDiff(arr[i],arr[j])<=c.splitDays;j++)w.push(arr[j]);
+      const s=w.reduce((x,t)=>x+t.amount,0);if(w.length>=2&&s>=c.threshold)w.forEach(t=>add(t,'SPLIT',`${w.length} trx total ${rps(s)} ${c.splitDays?`dalam ${c.splitDays+1} hari`:'di hari yang sama'}`))}}
+  const favs=[];
+  for(const [u,arr] of groupBy(tx,t=>t.maker).entries()){if(!u||arr.length<c.favMin)continue;const vg=groupBy(arr,t=>t.vendor);let best=null;for(const [v,a] of vg)if(!best||a.length>best[1].length)best=[v,a];
+    const sh=best[1].length/arr.length;if(sh*100>=c.favPct){favs.push({u,v:best[0],n:best[1].length,tot:arr.length});best[1].forEach(t=>add(t,'FAV',`${u}: ${Math.round(sh*100)}% transaksi ke vendor ini`))}}
+  const zmap=new Map();
+  for(const arr of groupBy(tx,t=>t.cat||'-').values()){if(arr.length<5)continue;const L=arr.map(t=>Math.log10(Math.max(t.amount,1)));const m=med(L);const mad=med(L.map(x=>Math.abs(x-m)));if(!mad)continue;
+    arr.forEach((t,i)=>{const z=.6745*(L[i]-m)/mad;zmap.set(t.id,z);if(Math.abs(z)>=c.zThr)add(t,'OUT',`z=${z.toFixed(1).replace('.',',')}, median kategori ${rps(Math.pow(10,m))}`)})}
+  for(const t of tx){
+    if(t.amount<c.threshold&&t.amount>=c.threshold*c.nearPct/100)add(t,'NEAR',`${pct(t.amount,c.threshold)} dari batas ${rps(c.threshold)}`);
+    if(t.amount>=c.roundMin&&c.roundMod>0&&t.amount%c.roundMod===0)add(t,'ROUND',`kelipatan ${rps(c.roundMod)}`);
+    const dw=dow(t.date);if(dw===0||dw===6)add(t,'WKND',HARI[dw]==='Sab'?'Sabtu':'Minggu');
+    const h=parseInt(t.time,10);if(!isNaN(h)&&(h<c.hStart||h>=c.hEnd))add(t,'HRS',`input pukul ${t.time}`);
+    if(t.maker&&t.approver&&t.maker===t.approver)add(t,'SOD',`${t.maker} membuat & menyetujui`);
+  }
+  const res=tx.map(t=>{const f=F.get(t.id);const score=Math.min(100,f.reduce((s,x)=>s+(+c.w[x.r]||0),0));return Object.assign({},t,{flags:f,score,level:score>=50?'T':score>=25?'S':score>0?'R':''})});
+  return {rows:res,favs,zmap};
+}
+const LV={T:'Tinggi',S:'Sedang',R:'Rendah'};
+
+/* ---------- State ---------- */
+const S={tx:[],src:'',res:null,status:store.get('pr-status',{}),open:new Set(),f:{lv:'',rule:'',q:'',st:''},msg:null};
+function load(tx,src){S.tx=tx;S.src=src;run()}
+function run(){S.res=detect(S.tx,cfg);const fl=S.res.rows.filter(r=>r.score>0).length;
+  $('#cntTemuan').textContent=fl;$('#cntData').textContent=S.tx.length;
+  const ds=S.tx.map(t=>t.date).sort();$('#srcLabel').textContent=`${S.src} · ${S.tx.length} transaksi${ds.length?` · ${ds[0]} s.d. ${ds[ds.length-1]}`:''}`;render()}
+
+/* ---------- Views ---------- */
+const chips=f=>f.map(x=>`<span class="chip ${RULE[x.r].g}">${esc(RULE[x.r].name)}</span>`).join('');
+const pill=r=>r.level?`<span class="pill ${r.level}">${r.score} · ${LV[r.level]}</span>`:'<span class="muted small">—</span>';
+function hbars(items,max){max=max||Math.max(1,...items.map(i=>i.v));return `<div class="hbar">${items.map(i=>`<div class="nm" title="${esc(i.l)}">${esc(i.l)}</div><div class="track"><div class="fill" style="width:${(100*i.v/max).toFixed(1)}%;background:${i.c||'var(--accent)'}"></div></div><div class="n">${i.t!=null?i.t:i.v}</div>`).join('')}</div>`}
+
+function vRingkasan(){
+  const R=S.res.rows,fl=R.filter(r=>r.score>0),tot=R.reduce((s,r)=>s+r.amount,0);
+  const cnt={T:0,S:0,R:0};fl.forEach(r=>cnt[r.level]++);
+  const exp=fl.filter(r=>r.level!=='R').reduce((s,r)=>s+r.amount,0);
+  const byRule=RULES.filter(r=>cfg.on[r.id]).map(r=>({l:r.name,v:fl.filter(x=>x.flags.some(f=>f.r===r.id)).length,c:GROUPS[r.g].c}));
+  // timeline
+  const days=[...new Set(R.map(r=>r.date))].sort();let tlHtml='',xs='';
+  if(days.length){const d0=Date.parse(days[0]),d1=Date.parse(days[days.length-1]);const n=Math.min(62,Math.round((d1-d0)/864e5)+1);const all=[];
+    for(let i=0;i<n;i++){const ds=new Date(d0+i*864e5).toISOString().slice(0,10);const a=R.filter(r=>r.date===ds);all.push({ds,nf:a.filter(r=>!r.score).length,fl:a.filter(r=>r.score>0).length})}
+    const mx=Math.max(1,...all.map(a=>a.nf+a.fl));
+    tlHtml=all.map(a=>`<div class="col${dow(a.ds)%6?'':' we'}" title="${fdate(a.ds)}: ${a.nf+a.fl} transaksi, ${a.fl} berpola"><span class="nf" style="height:${100*a.nf/mx}%"></span><span class="fl" style="height:${100*a.fl/mx}%"></span></div>`).join('');
+    xs=all.map((a,i)=>`<span>${i%5===0?+a.ds.slice(8):''}</span>`).join('')}
+  // vendors
+  const vs=[...groupBy(fl,r=>r.vendor).entries()].map(([v,a])=>({v,s:a.reduce((x,r)=>x+r.score,0),n:a.length,amt:a.reduce((x,r)=>x+r.amount,0),hi:a.filter(r=>r.level==='T').length})).sort((a,b)=>b.s-a.s).slice(0,6);
+  // top case
+  const top=[...fl].sort((a,b)=>b.score-a.score||b.flags.length-a.flags.length)[0];
+  let caseHtml='<p class="muted">Belum ada pola yang terdeteksi.</p>';
+  if(top){const rel=R.filter(r=>r.vendor===top.vendor&&dayDiff(r,top)<=4).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).slice(0,8);
+    const rs=[...new Set(rel.flatMap(r=>r.flags.map(f=>f.r)))];
+    const ind=rs.includes('DUP')&&rs.includes('SPLIT')?'duplicate payment / pemecahan transaksi':rs.includes('DUP')?'duplicate payment':rs.includes('SPLIT')?'pemecahan transaksi untuk menghindari otorisasi':rs.includes('OUT')?'nominal tidak wajar dibanding kategori':rs.includes('SOD')?'pelanggaran segregation of duties':'penyimpangan pola transaksi';
+    caseHtml=`<div class="case"><div class="tw"><table><thead><tr><th>ID</th><th>Vendor</th><th class="r">Jumlah</th><th>Tanggal</th><th>Skor</th></tr></thead><tbody>${rel.map(r=>`<tr class="${r.score>0?'hit':''}"><td class="mono">${r.id}</td><td>${esc(r.vendor)}</td><td class="r num">${rp(r.amount)}</td><td>${fdate(r.date)}</td><td>${pill(r)}</td></tr>`).join('')}</tbody></table></div>
+    <div class="found"><h4>Pola yang terdeteksi</h4><ul>${rs.map(x=>`<li>${esc(RULE[x].name)}</li>`).join('')}<li>${esc(top.vendor)} · ${rel.filter(r=>r.score>0).length} transaksi berdekatan</li></ul><div class="ind"><mark>Indikasi:</mark> ${ind}. Lanjutkan ke investigasi dan konfirmasi dokumen pendukung.</div></div></div>`}
+  const segs=[['T','var(--high)'],['S','var(--med)'],['R','var(--low)']].map(([k,c])=>`<span style="width:${100*cnt[k]/R.length}%;background:${c}" title="${LV[k]}: ${cnt[k]}"></span>`).join('');
+  return `<section class="view"><div class="vh"><div><h2>Ringkasan Audit Intelligence</h2><p>Population-based auditing: seluruh transaksi diuji terhadap ${RULES.filter(r=>cfg.on[r.id]).length} aturan pola, lalu diberi skor risiko 0–100.</p></div><a class="btn pri" href="#temuan">Tinjau temuan →</a></div>
+  <div class="kpis">
+    <div class="kpi"><div class="k">Transaksi dianalisis</div><div class="v">${R.length.toLocaleString('id-ID')}</div><div class="d">100% populasi, bukan sampel</div></div>
+    <div class="kpi"><div class="k">Nilai transaksi</div><div class="v">${rps(tot)}</div><div class="d">${groupBy(R,r=>r.vendor).size} vendor · ${groupBy(R,r=>r.maker).size} pembuat</div></div>
+    <div class="kpi"><div class="k">Transaksi berpola</div><div class="v">${fl.length}</div><div class="d">${pct(fl.length,R.length)} dari populasi</div></div>
+    <div class="kpi alert"><div class="k">Risiko tinggi</div><div class="v">${cnt.T}</div><div class="d">skor ≥ 50 · ${cnt.S} sedang · ${cnt.R} rendah</div></div>
+    <div class="kpi"><div class="k">Nilai terpapar</div><div class="v">${rps(exp)}</div><div class="d">risiko tinggi + sedang</div></div>
+  </div>
+  <div class="panel"><h3>Sebaran tingkat risiko</h3><p class="sub">Proporsi transaksi menurut skor. Bagian kosong = transaksi tanpa pola.</p><div class="seg">${segs}</div>
+   <div class="legend"><span><i style="background:var(--high)"></i>Tinggi ${cnt.T}</span><span><i style="background:var(--med)"></i>Sedang ${cnt.S}</span><span><i style="background:var(--low)"></i>Rendah ${cnt.R}</span><span><i style="background:var(--sunk);border:1px solid var(--line)"></i>Normal ${R.length-fl.length}</span></div></div>
+  <div class="panel"><h3>Ilustrasi kasus: dari transaksi biasa menjadi temuan pola mencurigakan</h3><p class="sub">Kluster transaksi di sekitar temuan dengan skor tertinggi (vendor sama, ±4 hari). Baris berwarna adalah transaksi yang ditandai.</p>${caseHtml}</div>
+  <div class="grid g2">
+    <div class="panel"><h3>Temuan per jenis pola</h3><p class="sub">Jumlah transaksi yang memicu tiap aturan. Satu transaksi dapat memicu beberapa aturan.</p>${hbars(byRule)}
+      <div class="legend">${Object.values(GROUPS).map(g=>`<span><i style="background:${g.c}"></i>${g.label}</span>`).join('')}</div></div>
+    <div class="panel"><h3>Timeline harian</h3><p class="sub">Volume transaksi per hari; merah = transaksi berpola, abu-abu = akhir pekan.</p><div class="tl">${tlHtml}</div><div class="tl-x">${xs}</div>
+      <div class="legend"><span><i style="background:var(--high)"></i>Berpola</span><span><i style="background:color-mix(in srgb,var(--accent) 28%,var(--sunk))"></i>Normal</span></div></div>
+  </div>
+  <div class="panel"><h3>Vendor dengan akumulasi skor risiko tertinggi</h3><p class="sub">Jumlah skor seluruh transaksi berpola per vendor.</p>
+   <div class="tw"><table><thead><tr><th>Vendor</th><th class="r">Trx berpola</th><th class="r">Risiko tinggi</th><th class="r">Nilai</th><th style="width:40%">Akumulasi skor</th></tr></thead><tbody>
+   ${vs.map(v=>`<tr><td>${esc(v.v)}</td><td class="r num">${v.n}</td><td class="r num">${v.hi}</td><td class="r num">${rps(v.amt)}</td><td><div class="hbar" style="grid-template-columns:minmax(0,1fr) 44px"><div class="track"><div class="fill" style="width:${100*v.s/vs[0].s}%;background:var(--high)"></div></div><div class="n">${v.s}</div></div></td></tr>`).join('')}</tbody></table></div></div>
+  <div class="note"><b>Anomaly is not fraud.</b> Pola abnormal adalah indikasi untuk investigasi, bukan bukti fraud. Tetap perlu validasi, korroborasi, dan professional judgment.</div>
+  </section>`}
+
+function filtered(){const f=S.f,q=f.q.trim().toLowerCase();return S.res.rows.filter(r=>r.score>0&&(!f.lv||r.level===f.lv)&&(!f.rule||r.flags.some(x=>x.r===f.rule))&&(!f.st||(S.status[r.id]||'Baru')===f.st)&&(!q||(r.id+' '+r.vendor+' '+r.maker+' '+r.approver+' '+r.desc).toLowerCase().includes(q))).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id))}
+const STS=['Baru','Investigasi','Temuan valid','Bukan fraud (dijelaskan)'];
+function vTemuan(){
+  const rows=filtered(),f=S.f,all=S.res.rows.filter(r=>r.score>0);
+  const stc=Object.fromEntries(STS.map(s=>[s,all.filter(r=>(S.status[r.id]||'Baru')===s).length]));
+  return `<section class="view"><div class="vh"><div><h2>Temuan pola</h2><p>Daftar transaksi berpola, diurutkan dari skor tertinggi. Klik baris untuk melihat alasan setiap aturan. Status tindak lanjut tersimpan di browser Anda.</p></div><button class="btn" id="copyCsv">Salin CSV temuan</button></div>
+  <div class="kpis">${STS.map(s=>`<div class="kpi"><div class="k">${s}</div><div class="v">${stc[s]}</div></div>`).join('')}</div>
+  <div class="panel"><div class="row" style="margin-bottom:12px">
+    <label class="field">Tingkat risiko<select id="fLv"><option value="">Semua</option>${Object.entries(LV).map(([k,v])=>`<option value="${k}"${f.lv===k?' selected':''}>${v}</option>`).join('')}</select></label>
+    <label class="field">Jenis pola<select id="fRule"><option value="">Semua</option>${RULES.map(r=>`<option value="${r.id}"${f.rule===r.id?' selected':''}>${esc(r.name)}</option>`).join('')}</select></label>
+    <label class="field">Status<select id="fSt"><option value="">Semua</option>${STS.map(s=>`<option${f.st===s?' selected':''}>${s}</option>`).join('')}</select></label>
+    <label class="field" style="flex:1;min-width:180px">Cari<input id="fQ" value="${esc(f.q)}" placeholder="ID, vendor, pengguna, keterangan"></label>
+  </div><div class="small muted" style="margin-bottom:8px">${rows.length} dari ${all.length} transaksi berpola</div>
+  <div id="copyMsg"></div>
+  <div class="tw" style="max-height:640px"><table><thead><tr><th>Skor</th><th>ID</th><th>Tanggal · jam</th><th>Vendor</th><th class="r">Jumlah</th><th>Pembuat → Penyetuju</th><th>Pola</th><th>Status</th></tr></thead><tbody>
+  ${rows.map(r=>`<tr class="clk" data-id="${r.id}"><td>${pill(r)}</td><td class="mono">${r.id}</td><td>${fdate(r.date)} · <span class="mono">${esc(r.time)}</span></td><td>${esc(r.vendor)}</td><td class="r num">${rp(r.amount)}</td><td>${esc(r.maker)} → ${esc(r.approver)}</td><td>${chips(r.flags)}</td>
+   <td><select class="inp st" data-id="${r.id}" aria-label="Status ${r.id}">${STS.map(s=>`<option${(S.status[r.id]||'Baru')===s?' selected':''}>${s}</option>`).join('')}</select></td></tr>
+   ${S.open.has(r.id)?`<tr class="det"><td colspan="8"><div class="notes">${r.flags.map(x=>`<div><span class="chip ${RULE[x.r].g}">${esc(RULE[x.r].name)} +${cfg.w[x.r]}</span><span>${esc(x.note)}</span></div>`).join('')}<div class="muted small">Kategori: ${esc(r.cat)} · Keterangan: ${esc(r.desc)}</div></div></td></tr>`:''}`).join('')||'<tr><td colspan="8" class="muted">Tidak ada transaksi yang cocok dengan filter.</td></tr>'}
+  </tbody></table></div></div></section>`}
+
+function benford(){const L=S.res.rows.map(r=>String(Math.floor(Math.abs(r.amount))).replace(/^0+/,'')).filter(s=>s.length>=2);const n=L.length;const c=Array(10).fill(0);L.forEach(s=>c[+s[0]]++);
+  const d=[];let mad=0;for(let k=1;k<=9;k++){const e=Math.log10(1+1/k),o=n?c[k]/n:0;const z=n?(Math.abs(o-e)-1/(2*n))/Math.sqrt(e*(1-e)/n):0;mad+=Math.abs(o-e);d.push({k,e,o,cnt:c[k],z})}return {n,d,mad:mad/9}}
+function vBenford(){
+  const b=benford(),mx=Math.max(...b.d.map(x=>Math.max(x.e,x.o)))*1.12;
+  const conf=b.mad<.006?['Close conformity','var(--ok)']:b.mad<.012?['Acceptable conformity','var(--ok)']:b.mad<.015?['Marginally acceptable','var(--med)']:['Nonconformity','var(--high)'];
+  return `<section class="view"><div class="vh"><div><h2>Benford's Law · uji digit pertama</h2><p>Pada data keuangan alami, digit 1 muncul ±30% dan digit 9 hanya ±4,6%. Penyimpangan besar bisa menandakan angka yang dibuat-buat, pemecahan nominal, atau batas otorisasi yang dihindari.</p></div></div>
+  <div class="kpis"><div class="kpi"><div class="k">Nominal diuji</div><div class="v">${b.n}</div><div class="d">nominal ≥ 10</div></div>
+   <div class="kpi"><div class="k">Mean absolute deviation</div><div class="v">${b.mad.toFixed(4).replace('.',',')}</div><div class="d">ambang Nigrini (digit pertama)</div></div>
+   <div class="kpi"><div class="k">Kesimpulan</div><div class="v" style="font-size:1.15rem;color:${conf[1]}">${conf[0]}</div><div class="d">${b.n<300?'Sampel < 300: tafsirkan dengan hati-hati':'Ukuran data memadai'}</div></div></div>
+  <div class="panel"><h3>Distribusi digit pertama</h3><p class="sub">Batang = proporsi aktual; garis putus-putus = harapan Benford. Batang merah: |z| > 1,96 (berbeda signifikan pada α = 5%).</p>
+   <div class="benf">${b.d.map(x=>`<div class="d" title="Digit ${x.k}: aktual ${pct(x.o,1)}, harapan ${pct(x.e,1)}"><div class="o${x.z>1.96?' z':''}" style="height:${100*x.o/mx}%"></div><div class="e" style="bottom:${100*x.e/mx}%"></div></div>`).join('')}</div>
+   <div class="benf-x">${b.d.map(x=>`<span>${x.k}</span>`).join('')}</div>
+   <div class="legend"><span><i style="background:var(--accent)"></i>Aktual</span><span><i style="background:var(--high)"></i>Aktual, signifikan</span><span><i style="background:var(--expect)"></i>Harapan Benford</span></div></div>
+  <div class="panel"><h3>Tabel uji per digit</h3><div class="tw"><table><thead><tr><th>Digit</th><th class="r">Jumlah</th><th class="r">Aktual</th><th class="r">Harapan</th><th class="r">Selisih</th><th class="r">z-stat</th></tr></thead><tbody>
+   ${b.d.map(x=>`<tr class="${x.z>1.96?'hit':''}"><td class="mono">${x.k}</td><td class="r num">${x.cnt}</td><td class="r num">${pct(x.o,1)}</td><td class="r num">${pct(x.e,1)}</td><td class="r num">${((x.o-x.e)*100).toFixed(1).replace('.',',')} pp</td><td class="r num">${x.z.toFixed(2).replace('.',',')}</td></tr>`).join('')}</tbody></table></div>
+   <p class="small muted" style="margin:10px 0 0">Ambang MAD: &lt; 0,006 close · 0,006–0,012 acceptable · 0,012–0,015 marginal · &gt; 0,015 nonconformity. Digit yang menyimpang dapat ditelusuri lewat menu Temuan atau langsung ke data sumber.</p></div></section>`}
+
+function vRelasi(){
+  const R=S.res.rows,us=[...groupBy(R,r=>r.maker).keys()].sort(),vs=[...groupBy(R,r=>r.vendor).entries()].sort((a,b)=>b[1].length-a[1].length).slice(0,12).map(x=>x[0]);
+  const cell=(u,v)=>{const a=R.filter(r=>r.maker===u&&r.vendor===v);return {n:a.length,f:a.filter(r=>r.score>0).length,s:a.reduce((x,r)=>x+r.score,0)}};
+  const mxS=Math.max(1,...us.flatMap(u=>vs.map(v=>cell(u,v).s)));
+  const ap=[...groupBy(R,r=>r.approver).entries()].map(([a,arr])=>({a,n:arr.length,amt:arr.reduce((x,r)=>x+r.amount,0),sod:arr.filter(r=>r.maker===a).length,f:arr.filter(r=>r.score>0).length})).sort((x,y)=>y.amt-x.amt);
+  const offh=[...groupBy(R.filter(r=>r.flags.some(f=>f.r==='HRS'||f.r==='WKND')),r=>r.maker).entries()].map(([u,a])=>({l:u,v:a.length})).sort((a,b)=>b.v-a.v);
+  return `<section class="view"><div class="vh"><div><h2>Relasi &amp; perilaku</h2><p>Relationship analysis antara pembuat transaksi, vendor, dan penyetuju. Konsentrasi yang tidak wajar sering menjadi pintu masuk kolusi atau conflict of interest.</p></div></div>
+  <div class="panel"><h3>Matriks pembuat × vendor</h3><p class="sub">Angka = jumlah transaksi (berpola dalam kurung). Warna = akumulasi skor risiko. 12 vendor terbanyak.</p>
+   <div class="tw"><table class="hm"><thead><tr><th>Pembuat</th>${vs.map(v=>`<th title="${esc(v)}">${esc(v.replace(/^(PT|CV) /,''))}</th>`).join('')}</tr></thead><tbody>
+   ${us.map(u=>`<tr><td><b>${esc(u)}</b></td>${vs.map(v=>{const c=cell(u,v);return `<td class="c" style="background:color-mix(in srgb,var(--high) ${Math.round(70*c.s/mxS)}%,transparent)" title="${esc(u)} → ${esc(v)}: ${c.n} trx, ${c.f} berpola, skor ${c.s}">${c.n?c.n+(c.f?` (${c.f})`:''):'·'}</td>`}).join('')}</tr>`).join('')}</tbody></table></div></div>
+  <div class="grid g2">
+   <div class="panel"><h3>Profil penyetuju</h3><p class="sub">SoD = transaksi yang disetujui oleh pembuatnya sendiri.</p><div class="tw"><table><thead><tr><th>Penyetuju</th><th class="r">Trx</th><th class="r">Nilai</th><th class="r">Berpola</th><th class="r">SoD</th></tr></thead><tbody>
+    ${ap.map(a=>`<tr class="${a.sod?'hit':''}"><td>${esc(a.a)}</td><td class="r num">${a.n}</td><td class="r num">${rps(a.amt)}</td><td class="r num">${a.f}</td><td class="r num">${a.sod}</td></tr>`).join('')}</tbody></table></div></div>
+   <div class="panel"><h3>Konsentrasi vendor favorit</h3><p class="sub">Pembuat dengan ≥ ${cfg.favPct}% transaksinya ke satu vendor (min. ${cfg.favMin} transaksi).</p>
+    ${S.res.favs.length?S.res.favs.map(x=>`<div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><span><b>${esc(x.u)}</b> → ${esc(x.v)}</span><span class="num">${x.n}/${x.tot} · ${pct(x.n,x.tot)}</span></div>`).join(''):'<p class="muted">Tidak ada konsentrasi di atas ambang.</p>'}
+    <h3 style="margin-top:18px">Aktivitas di luar kebiasaan</h3><p class="sub">Transaksi di luar jam kerja atau akhir pekan per pembuat.</p>${offh.length?hbars(offh.map(o=>Object.assign(o,{c:'var(--c2)'}))):'<p class="muted">Tidak ada.</p>'}</div>
+  </div></section>`}
+
+const TEMPLATE='id,tanggal,jam,vendor,jumlah,pembuat,penyetuju,kategori,keterangan\nTRX001,2026-11-03,10:12,PT Sinar Abadi,49000000,BUDI,HADI,Pengadaan,Pembelian material\nTRX002,2026-11-03,14:47,PT Sinar Abadi,49000000,BUDI,HADI,Pengadaan,Pembelian material';
+function vData(){
+  const m=S.msg;
+  return `<section class="view"><div class="vh"><div><h2>Sumber data</h2><p>Unggah ekstrak transaksi dari GL / core banking, payment, atau procurement dalam format CSV. Data diproses di browser Anda dan tidak dikirim ke server mana pun.</p></div></div>
+  ${m?`<div class="msg ${m.t}">${esc(m.s)}</div>`:''}
+  <div class="grid g2">
+   <div class="panel"><h3>Muat data</h3><p class="sub">Sumber aktif: ${esc(S.src)}</p>
+    <div class="row"><label class="btn pri" for="fileIn">Unggah CSV</label><input type="file" id="fileIn" accept=".csv,.txt,text/csv" hidden><button class="btn" id="loadSample">Muat data contoh</button></div>
+    <p class="small muted" style="margin:14px 0 6px">Atau tempel isi CSV di sini:</p><textarea id="pasteIn" placeholder="${esc(TEMPLATE.split('\n')[0])}"></textarea>
+    <div class="row" style="margin-top:8px"><button class="btn" id="parsePaste">Proses teks</button></div></div>
+   <div class="panel"><h3>Format kolom</h3><p class="sub">Wajib: <b>tanggal</b>, <b>vendor</b>, <b>jumlah</b>. Opsional: id, jam, pembuat, penyetuju, kategori, keterangan. Pemisah koma, titik koma, atau tab. Tanggal YYYY-MM-DD atau DD/MM/YYYY; nominal boleh "49.000.000".</p>
+    <pre class="code" id="tpl">${esc(TEMPLATE)}</pre><div class="row" style="margin-top:8px"><button class="btn" id="copyTpl">Salin template</button><span id="tplMsg" class="small muted"></span></div>
+    <p class="small muted">Nama kolom alternatif dikenali, misalnya amount/nominal, date/tgl, supplier, maker/user, approver/checker, category/akun.</p></div>
+  </div>
+  <div class="panel"><h3>Pratinjau data</h3><p class="sub">50 baris pertama dari ${S.tx.length} transaksi.</p><div class="tw" style="max-height:420px"><table><thead><tr><th>ID</th><th>Tanggal</th><th>Jam</th><th>Vendor</th><th class="r">Jumlah</th><th>Pembuat</th><th>Penyetuju</th><th>Kategori</th><th>Keterangan</th></tr></thead><tbody>
+  ${S.tx.slice(0,50).map(t=>`<tr><td class="mono">${esc(t.id)}</td><td class="mono">${esc(t.date)}</td><td class="mono">${esc(t.time)}</td><td>${esc(t.vendor)}</td><td class="r num">${rp(t.amount)}</td><td>${esc(t.maker)}</td><td>${esc(t.approver)}</td><td>${esc(t.cat)}</td><td>${esc(t.desc)}</td></tr>`).join('')}</tbody></table></div></div></section>`}
+
+function vMesin(){
+  const fl=S.res.rows;const n=id=>fl.filter(r=>r.flags.some(f=>f.r===id)).length;
+  const P=[['threshold','Batas otorisasi (Rp)',1000000],['nearPct','Ambang "mendekati batas" (%)',1],['dupDays','Jendela duplikat (hari)',1],['splitDays','Jendela split (hari)',1],['splitMinPct','Min. nominal per trx split (% batas)',5],['roundMod','Kelipatan nominal bulat (Rp)',1000000],['roundMin','Minimum nominal bulat (Rp)',1000000],['hStart','Jam kerja mulai',1],['hEnd','Jam kerja selesai',1],['favPct','Ambang vendor favorit (%)',5],['favMin','Min. transaksi per pembuat',1],['zThr','Ambang robust z-score',.5]];
+  return `<section class="view"><div class="vh"><div><h2>Mesin deteksi</h2><p>Atur parameter dan bobot setiap aturan. Skor risiko transaksi = jumlah bobot aturan yang terpicu (maks. 100): ≥ 50 tinggi, 25–49 sedang, 1–24 rendah. Perubahan langsung diterapkan.</p></div><button class="btn" id="resetCfg">Kembalikan default</button></div>
+  <div class="panel"><h3>Parameter</h3><p class="sub">Sesuaikan dengan kebijakan otorisasi dan jam operasional organisasi Anda.</p><div class="params">
+   ${P.map(([k,l,s])=>`<label class="field">${l}<input type="number" class="cfg" id="cfg-${k}" data-k="${k}" step="${s}" min="0" value="${cfg[k]}"></label>`).join('')}</div></div>
+  ${Object.entries(GROUPS).map(([g,G])=>`<div class="panel"><h3 style="color:${G.c}">${G.label}</h3><p class="sub">Aktif · aturan · bobot · terdeteksi</p>
+   ${RULES.filter(r=>r.g===g).map(r=>`<div class="rule"><input type="checkbox" class="ron" id="on-${r.id}" data-r="${r.id}"${cfg.on[r.id]?' checked':''} aria-label="Aktifkan ${esc(r.name)}"><div><div class="t">${esc(r.name)}</div><div class="ds">${esc(r.desc)}</div></div><input type="number" class="inp rw" id="w-${r.id}" data-r="${r.id}" min="0" max="100" value="${cfg.w[r.id]}" aria-label="Bobot ${esc(r.name)}"><div class="num" style="text-align:right">${n(r.id)}</div></div>`).join('')}</div>`).join('')}
+  </section>`}
+
+function vPanduan(){
+  const T=[['Rule-Based Detection','Mendeteksi pelanggaran aturan','on','Duplikat, split, SoD, jam kerja, nominal bulat'],['Benford\'s Law','Anomali distribusi digit','on','Menu Benford\'s Law'],['Statistical outlier (robust z)','Nominal tidak wajar per kategori','on','Pengganti ringan Isolation Forest'],['Time Series Analysis','Perubahan pola dari waktu ke waktu','part','Timeline harian'],['Graph / Relationship Analytics','Jaringan transaksi & relasi','part','Matriks pembuat × vendor'],['Clustering (K-Means)','Kelompokkan transaksi berdasarkan karakteristik','off',''],['Isolation Forest','Transaksi abnormal multivariat','off',''],['Association Rules / Sequence Mining','Hubungan & urutan aktivitas','off','']];
+  const TL={on:'Tersedia',part:'Sebagian',off:'Pengembangan'};
+  return `<section class="view"><div class="vh"><div><h2>Arsitektur &amp; panduan</h2><p>Kerangka audit intelligence yang menjadi acuan aplikasi ini, beserta peta pengembangannya.</p></div></div>
+  <div class="panel"><h3>Arsitektur Audit Intelligence</h3><p class="sub">Alur data dari sumber hingga dashboard dan tindak lanjut.</p><div class="flow">
+   <div class="st"><h4>Data Sources</h4><ul><li>GL / Core Banking</li><li>Payment</li><li>Procurement</li><li>HR</li><li>User logs</li></ul></div>
+   <div class="st"><h4>Processing &amp; Normalization</h4><ul><li>Cleaning</li><li>Mapping kolom</li><li>Enrichment (hari, jam, kategori)</li></ul></div>
+   <div class="st ai"><h4>Pattern Recognition Engine</h4><ul><li>Rules</li><li>Statistical analysis</li><li>Machine learning*</li><li>Graph AI*</li></ul></div>
+   <div class="st"><h4>Output &amp; Insight</h4><ul><li>Anomaly detection</li><li>Fraud indicators</li><li>Risk scoring</li><li>Control analytics</li></ul></div>
+   <div class="st"><h4>Audit Dashboard</h4><ul><li>Alert</li><li>Investigasi</li><li>Audit finding</li><li>Monitoring</li></ul></div>
+  </div><p class="small muted" style="margin:10px 0 0">* Tahap pengembangan berikutnya.</p></div>
+  <div class="panel"><h3>Teknik &amp; algoritma</h3><div class="tw"><table><thead><tr><th>Teknik</th><th>Fungsi</th><th>Status</th><th>Di aplikasi ini</th></tr></thead><tbody>
+   ${T.map(t=>`<tr><td><b>${t[0]}</b></td><td>${t[1]}</td><td><span class="tag ${t[2]}">${TL[t[2]]}</span></td><td class="muted">${t[3]||'—'}</td></tr>`).join('')}</tbody></table></div></div>
+  <div class="panel"><h3>Perubahan paradigma internal audit</h3><div class="flow" style="margin-top:10px">
+   <div class="st"><h4>Traditional Audit</h4><ul><li>Sample-based</li><li>Mencari kesalahan yang sudah terjadi</li></ul></div>
+   <div class="st"><h4>Data-Driven Audit</h4><ul><li>Population-based</li><li>Seluruh transaksi dianalisis untuk menemukan anomali</li></ul></div>
+   <div class="st ai"><h4>Intelligent Audit</h4><ul><li>Predictive &amp; continuous</li><li>Mengenali pola dan memberi early warning</li></ul></div></div></div>
+  <div class="grid g2">
+   <div class="panel"><h3>Contoh penerapan di perbankan &amp; fintech</h3><div class="tw"><table><tbody>
+    ${[['Credit','Konsentrasi debitur, pola pencairan tidak normal'],['Payment','Duplicate payment, split transaction'],['Merchant','Merchant berelasi, transaksi sirkular'],['Procurement','Vendor favorit, bidding irregularities'],['Treasury','Unusual trading patterns'],['IT Security','Privilege abuse, abnormal login'],['HR','Payroll duplication, ghost employee'],['Compliance','Repeated regulatory breaches']].map(x=>`<tr><td><b>${x[0]}</b></td><td style="white-space:normal">${x[1]}</td></tr>`).join('')}</tbody></table></div></div>
+   <div class="panel"><h3>Rekomendasi pengembangan</h3><p class="sub">Urutan pembangunan engine yang disarankan.</p>
+    ${[['Transaction Pattern Engine','on'],['Behavioral Pattern Engine','on'],['Anomaly Detection Engine','part'],['Relationship & Graph Analysis Engine','part'],['Predictive Risk Pattern Engine','off']].map((x,i)=>`<div class="row" style="justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)"><span><span class="num muted">${i+1}.</span> ${x[0]}</span><span class="tag ${x[1]}">${TL[x[1]]}</span></div>`).join('')}
+    <div class="note" style="margin-top:14px"><b>Ingat: "Anomaly is not fraud."</b> Pola abnormal adalah indikasi untuk investigasi, bukan bukti fraud. Tetap perlu validasi, korroborasi, dan professional judgment.</div></div>
+  </div></section>`}
+
+const VIEWS={ringkasan:vRingkasan,temuan:vTemuan,benford:vBenford,relasi:vRelasi,data:vData,mesin:vMesin,panduan:vPanduan};
+function cur(){const h=location.hash.slice(1);return VIEWS[h]?h:'ringkasan'}
+function render(){const v=cur();const es=$('#engState');if(es)es.textContent=RULES.filter(r=>cfg.on[r.id]).length+' aturan aktif';document.querySelectorAll('#rail a').forEach(a=>a.getAttribute('href')==='#'+v?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
+  if(!S.res){return}$('#main').innerHTML=VIEWS[v]();bind(v)}
+
+/* ---------- CSV import ---------- */
+const ALI={id:['id','id_transaksi','no','nomor','trx','no_transaksi'],date:['tanggal','date','tgl','tanggal_transaksi'],time:['jam','time','waktu'],vendor:['vendor','supplier','pemasok','penerima','nama_vendor'],amount:['jumlah','amount','nominal','nilai','total'],maker:['pembuat','maker','user','dibuat_oleh','created_by'],approver:['penyetuju','approver','checker','disetujui_oleh','approved_by'],cat:['kategori','category','akun','account','coa'],desc:['keterangan','description','deskripsi','memo','uraian']};
+function parseCSV(text){text=text.replace(/^﻿/,'');const first=text.split('\n')[0];const dl=[',',';','\t'].sort((a,b)=>first.split(b).length-first.split(a).length)[0];
+  const rows=[];let row=[],f='',q=false;for(let i=0;i<text.length;i++){const c=text[i];if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=c}else if(c==='"')q=true;else if(c===dl){row.push(f);f=''}else if(c==='\n'){row.push(f);rows.push(row);row=[];f=''}else if(c!=='\r')f+=c}
+  if(f||row.length){row.push(f);rows.push(row)}return rows.filter(r=>r.some(x=>x.trim()))}
+function pAmt(s){s=String(s).replace(/rp|idr|\s/gi,'');if(/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s))s=s.replace(/\./g,'').replace(',','.');else if(/^-?\d{1,3}(,\d{3})+(\.\d+)?$/.test(s))s=s.replace(/,/g,'');else s=s.replace(',','.');return Math.round(parseFloat(s))}
+function pDate(s){s=String(s).trim();let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}:\d{2}))?/);if(m)return [`${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`,m[4]];
+  m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})(?:\s+(\d{1,2}:\d{2}))?/);if(m)return [`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`,m[4]];return [null]}
+function importCSV(text,name){
+  const rows=parseCSV(text);if(rows.length<2)throw new Error('File tidak berisi data. Pastikan baris pertama adalah header dan ada minimal satu baris transaksi.');
+  const H=rows[0].map(h=>h.trim().toLowerCase().replace(/[\s\-]+/g,'_'));const idx={};for(const [k,al] of Object.entries(ALI)){const i=H.findIndex(h=>al.includes(h));if(i>=0)idx[k]=i}
+  const miss=['date','vendor','amount'].filter(k=>idx[k]==null);if(miss.length)throw new Error('Kolom wajib tidak ditemukan: '+miss.map(k=>ALI[k][0]).join(', ')+'. Header terbaca: '+rows[0].join(', '));
+  const tx=[];let bad=0;rows.slice(1).forEach((r,i)=>{const g=k=>idx[k]!=null?(r[idx[k]]||'').trim():'';const [d,tm]=pDate(g('date'));const a=pAmt(g('amount'));if(!d||isNaN(a)){bad++;return}
+    let t=g('time')||tm||'';const mt=t.match(/^(\d{1,2}):(\d{2})/);t=mt?mt[1].padStart(2,'0')+':'+mt[2]:'09:00';
+    tx.push({id:g('id')||'R'+String(i+1).padStart(5,'0'),date:d,time:t,vendor:g('vendor')||'(tanpa nama)',amount:a,maker:g('maker').toUpperCase(),approver:g('approver').toUpperCase(),cat:g('cat')||'Umum',desc:g('desc')})});
+  if(!tx.length)throw new Error('Tidak ada baris yang valid. Periksa format tanggal dan nominal.');
+  const seen=new Set();tx.forEach(t=>{let id=t.id,k=2;while(seen.has(id))id=t.id+'-'+k++;t.id=id;seen.add(id)});
+  load(tx,name);S.msg={t:'ok',s:`${tx.length} transaksi dimuat dari ${name}${bad?`, ${bad} baris dilewati karena tanggal/nominal tidak valid`:''}.`};render()}
+
+function copyText(txt,target){const done=ok=>{const el=$(target);if(el)el.innerHTML=ok?'<span class="msg ok">Tersalin ke clipboard.</span>':`<p class="small muted">Clipboard tidak tersedia. Salin manual:</p><textarea readonly>${esc(txt)}</textarea>`;if(!ok){const ta=el&&el.querySelector('textarea');if(ta){ta.focus();ta.select()}}};
+  try{navigator.clipboard.writeText(txt).then(()=>done(true),()=>done(false))}catch(e){done(false)}}
+
+function bind(v){
+  if(v==='temuan'){
+    const upd=()=>{S.f={lv:$('#fLv').value,rule:$('#fRule').value,st:$('#fSt').value,q:$('#fQ').value};const pos=$('#fQ').selectionStart;render();if(document.activeElement!==$('#fQ')&&S._q){$('#fQ').focus();$('#fQ').setSelectionRange(pos,pos)}};
+    ['#fLv','#fRule','#fSt'].forEach(s=>$(s).onchange=upd);$('#fQ').oninput=()=>{S._q=true;upd();S._q=false};
+    document.querySelectorAll('tr.clk').forEach(tr=>tr.onclick=e=>{if(e.target.closest('select'))return;const id=tr.dataset.id;S.open.has(id)?S.open.delete(id):S.open.add(id);render()});
+    document.querySelectorAll('select.st').forEach(s=>s.onchange=()=>{S.status[s.dataset.id]=s.value;store.set('pr-status',S.status);render()});
+    $('#copyCsv').onclick=()=>{const rows=filtered();const q=x=>`"${String(x).replace(/"/g,'""')}"`;
+      const txt=['id,tanggal,jam,vendor,jumlah,pembuat,penyetuju,skor,tingkat,pola,catatan,status'].concat(rows.map(r=>[r.id,r.date,r.time,r.vendor,r.amount,r.maker,r.approver,r.score,LV[r.level],r.flags.map(f=>RULE[f.r].name).join(' | '),r.flags.map(f=>f.note).join(' | '),S.status[r.id]||'Baru'].map(q).join(','))).join('\n');copyText(txt,'#copyMsg')};
+  }
+  if(v==='data'){
+    $('#loadSample').onclick=()=>{load(sample(),'Data contoh (fiktif)');S.msg={t:'ok',s:'Data contoh dimuat ulang.'};render()};
+    $('#fileIn').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{importCSV(rd.result,f.name)}catch(err){S.msg={t:'err',s:err.message};render()}};rd.readAsText(f)};
+    $('#parsePaste').onclick=()=>{try{importCSV($('#pasteIn').value,'Data tempel')}catch(err){S.msg={t:'err',s:err.message};render()}};
+    $('#copyTpl').onclick=()=>copyText(TEMPLATE,'#tplMsg');
+  }
+  if(v==='mesin'){
+    const save=()=>{store.set('pr-cfg',cfg);const a=document.activeElement&&document.activeElement.id;S.res=detect(S.tx,cfg);$('#cntTemuan').textContent=S.res.rows.filter(r=>r.score>0).length;render();if(a){const el=document.getElementById(a);if(el)el.focus()}};
+    document.querySelectorAll('input.cfg').forEach(i=>i.onchange=()=>{const x=parseFloat(i.value);if(!isNaN(x)&&x>=0){cfg[i.dataset.k]=x;save()}});
+    document.querySelectorAll('input.ron').forEach(i=>i.onchange=()=>{cfg.on[i.dataset.r]=i.checked;save()});
+    document.querySelectorAll('input.rw').forEach(i=>i.onchange=()=>{const x=parseFloat(i.value);if(!isNaN(x)){cfg.w[i.dataset.r]=Math.max(0,Math.min(100,x));save()}});
+    $('#resetCfg').onclick=()=>{cfg=JSON.parse(JSON.stringify(DEF));save()};
+  }
+}
+window.addEventListener('hashchange',()=>{S.msg=null;render();window.scrollTo(0,0)});
+load(sample(),'Data contoh (fiktif)');
+})();
+</script>
