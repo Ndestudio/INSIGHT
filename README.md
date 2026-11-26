@@ -17,6 +17,11 @@ Aplikasi web satu halaman untuk Internal Audit InJourney Aviation Services. Apli
 | Behavioral Pattern | Di luar jam kerja, pembuat = penyetuju, vendor favorit |
 | Anomaly Pattern | Outlier nominal (robust z-score per kategori) |
 
+## Cara membuka
+
+- **Di komputer:** klik dua kali `index.html`, atau seret ke jendela browser (Chrome, Edge, Firefox). Tidak perlu instalasi atau server. Koneksi internet hanya dipakai untuk memuat font Montserrat.
+- **Lewat web:** aktifkan GitHub Pages (Settings → Pages → Deploy from a branch → `main` / root). Aplikasi lalu bisa dibuka di `https://ndestudio.github.io/INSIGHT/`.
+
 ## Format CSV
 
 Kolom wajib: `tanggal`, `vendor`, `jumlah`. Opsional: `id`, `jam`, `pembuat`, `penyetuju`, `kategori`, `keterangan`.
@@ -30,7 +35,7 @@ TRX001,2026-11-03,10:12,PT Sinar Abadi,49000000,BUDI,HADI,Pengadaan,Pembelian ma
 
 | File | Isi |
 |---|---|
-| `pattern-recognition-audit.html` | Seluruh aplikasi (HTML, CSS, JavaScript) |
+| `index.html` | Seluruh aplikasi (HTML, CSS, JavaScript) |
 | `ias-logo-white.png` | Logo IAS versi putih |
 | `hero-globe.jpg` | Gambar globe untuk header |
 
