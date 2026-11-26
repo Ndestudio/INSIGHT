@@ -4,13 +4,13 @@ Aplikasi web satu halaman untuk Internal Audit InJourney Aviation Services. Apli
 
 ## Fitur
 
-- **Ringkasan**: angka utama, sebaran tingkat risiko, timeline harian, ilustrasi kasus teratas, dan vendor dengan skor tertinggi.
+- **Ringkasan**: angka utama, sebaran tingkat risiko, **tren risiko per bulan** (temuan per bulan menurut tingkat risiko, porsi transaksi berpola, dan perbandingan dengan bulan sebelumnya), timeline harian (61 hari terakhir), ilustrasi kasus teratas, dan vendor dengan skor tertinggi. Tren tampil bila data mencakup minimal 2 bulan (maks. 12 bulan terakhir).
 - **Temuan**: daftar transaksi berpola dengan filter, alasan per aturan, status tindak lanjut, dan salin CSV.
 - **Laporan pimpinan (PDF)**: dari menu Ringkasan atau Temuan, buka pratinjau laporan eksekutif A4 bergaya dashboard dengan identitas IAS, lalu klik **Unduh PDF** atau **Cetak**. Isinya:
-  - *Halaman 1 – Ikhtisar*: sampul dengan periode dan sumber data, 5 indikator utama, pesan utama untuk pimpinan (disusun otomatis dari hasil analisis), sebaran tingkat risiko, temuan per jenis pola, vendor berisiko, status tindak lanjut, dan timeline harian.
+  - *Halaman 1 – Ikhtisar*: sampul dengan periode dan sumber data, 5 indikator utama, pesan utama untuk pimpinan (disusun otomatis dari hasil analisis), sebaran tingkat risiko, temuan per jenis pola, vendor berisiko, status tindak lanjut, tren risiko per bulan, dan timeline harian.
   - *Halaman 2 – Prioritas & rekomendasi*: 10 temuan berisiko tertinggi, temuan per kelompok pola, uji Benford's Law, metodologi singkat, rekomendasi tindak lanjut sesuai pola yang ditemukan, catatan, dan kolom tanda tangan.
   - *Lampiran*: daftar temuan lainnya (34 baris per halaman).
-- **Export laporan (Excel)**: dari menu Ringkasan atau Temuan, unduh rekap temuan dalam satu file `.xlsx` berisi 4 sheet: *Ringkasan* (indikator utama, temuan per pola, status tindak lanjut, vendor berisiko), *Daftar Temuan* (seluruh transaksi berpola beserta skor, pola, alasan, dan status), *Benford*, dan *Parameter* mesin deteksi yang dipakai.
+- **Export laporan (Excel)**: dari menu Ringkasan atau Temuan, unduh rekap temuan dalam satu file `.xlsx` berisi 5 sheet: *Ringkasan* (indikator utama, temuan per pola, status tindak lanjut, vendor berisiko), *Tren Bulanan* (transaksi, temuan, dan nilai terpapar per bulan menurut tingkat risiko), *Daftar Temuan* (seluruh transaksi berpola beserta skor, pola, alasan, dan status), *Benford*, dan *Parameter* mesin deteksi yang dipakai.
 - **Benford's Law**: uji digit pertama dengan MAD (ambang Nigrini) dan z-stat per digit.
 - **Relasi & Perilaku**: matriks pembuat × vendor, profil penyetuju (SoD), vendor favorit, aktivitas di luar jam kerja.
 - **Sumber Data**: unggah file Excel (`.xlsx`/`.xls`) atau CSV, atau tempel teks CSV. Data diproses di browser dan tidak dikirim ke server.
@@ -69,4 +69,4 @@ Cara pakai: buka `template-transaksi.xlsx`, hapus baris contoh di sheet *Transak
 
 Tampilan mengikuti Brand Guideline IAS: font Montserrat, Navy `#1D2250`, Tosca `#04B0C0`, abu-abu `#D1D3D4`.
 
-> Data bawaan aplikasi adalah data contoh fiktif. Pola abnormal adalah indikasi untuk investigasi, bukan bukti fraud.
+> Data bawaan aplikasi adalah data contoh fiktif (sekitar 1.500 transaksi, Juni–November 2026). Pola abnormal adalah indikasi untuk investigasi, bukan bukti fraud.

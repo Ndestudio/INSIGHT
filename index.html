@@ -92,6 +92,21 @@ section.view{display:flex;flex-direction:column;gap:18px}
 .tl .col.we .nf{background:color-mix(in srgb,var(--muted) 22%,var(--sunk))}
 .tl-x{display:flex;gap:3px;font-size:.7rem;color:var(--muted);font-family:var(--f-mono)}
 .tl-x span{flex:1;text-align:center;min-width:0}
+.mt-plot{display:flex;align-items:flex-end;justify-content:space-around;gap:8px;height:210px;border-bottom:1px solid var(--line);padding-top:22px}
+.mt .mc{flex:1;max-width:96px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;position:relative;outline:none;cursor:default}
+.mt .mv{font-weight:700;font-size:.8rem;color:var(--ink);margin-bottom:4px;font-variant-numeric:tabular-nums}
+.mt .mb{width:58%;min-width:14px;display:flex;flex-direction:column-reverse;gap:2px}
+.mt .mb span{display:block;width:100%;min-height:2px}
+.mt .mb span:last-child{border-radius:4px 4px 0 0}
+.mt .mc:hover .mb,.mt .mc:focus-visible .mb{filter:brightness(1.15)}
+.mt .tip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);z-index:5;width:max-content;max-width:240px;background:var(--surface-solid);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:.75rem;line-height:1.5;color:var(--muted);box-shadow:0 8px 24px rgba(0,0,0,.4);pointer-events:none}
+.mt .tip b{display:block;color:var(--ink)}
+.mt .tip i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:3px}
+.mt .mc:hover .tip,.mt .mc:focus .tip{display:block}
+.mt .mc:first-child .tip{left:0;transform:none}.mt .mc:last-child .tip{left:auto;right:0;transform:none}
+.mt-x{display:flex;justify-content:space-around;gap:8px;margin-top:6px}
+.mt-x span{flex:1;max-width:96px;text-align:center;font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.mt-x b{display:block;color:var(--ink);font-weight:600}
 .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.78rem;color:var(--muted);margin-top:10px}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
 
@@ -329,6 +344,14 @@ pre.code{background:rgba(6,10,34,.6)}
 .pg .tl span{display:block}
 .pg .tlx{display:flex;gap:2px;font-size:7.5px;color:#6B6F8C;margin-top:3px}
 .pg .tlx span{flex:1;text-align:center}
+.pg .mt-plot{height:96px;padding-top:12px;border-bottom:1px solid #D1D3D4;gap:4px}
+.pg .mt .mv{font-size:8px;color:#1D2250;margin-bottom:2px}
+.pg .mt .mb{gap:1px}
+.pg .mt .mb span:last-child{border-radius:2px 2px 0 0}
+.pg .mt .tip{display:none!important}
+.pg .mt-x{margin-top:3px;gap:4px}
+.pg .mt-x span{font-size:7.5px;color:#6B6F8C;line-height:1.3}
+.pg .mt-x b{color:#1D2250;font-weight:700}
 .pg .grp{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .pg .grp div{border:1px solid #D1D3D4;border-radius:6px;padding:9px 10px;border-left:4px solid}
 .pg .grp b{display:block;font-size:16px;font-weight:800}
@@ -464,6 +487,24 @@ function sample(){
   add('16','11:45',3,33000000,'BUDI','BUDI','Pembelian material');
   // Outlier
   add('27','15:10',5,1850000000,'ANDI','HADI','Biaya pengiriman proyek');add('18','10:20',4,145000000,'CITRA','RINA','Pembelian ATK');
+  // Riwayat Juni–Oktober 2026 (untuk tren bulanan), dengan kasus pola yang meningkat
+  const h=rng(20260601),hp=a=>a[Math.floor(h()*a.length)],INT=[2,3,3,5,7];
+  const tm=()=>`${p2(8+Math.floor(h()*9))}:${p2(Math.floor(h()*60))}`;
+  const put=(date,time,vi,amount,maker,approver,desc)=>tx.push({date,time,vendor:V[vi][0],amount,maker,approver,cat:V[vi][1],desc:desc||DESC[V[vi][1]]});
+  for(let k=0;k<5;k++){const mo=p2(6+k),nd=new Date(2026,6+k,0).getDate(),wdk=[],wek=[];
+    for(let d=1;d<=nd;d++){const s=`2026-${mo}-${p2(d)}`;(dow(s)%6?wdk:wek).push(s)}
+    const nb=205+Math.floor(h()*45);
+    for(let i=0;i<nb;i++){const u=hp(['ANDI','ANDI','BUDI','BUDI','CITRA','CITRA','DEWI','EKO','EKO']);let v=hp(V);if(u==='DEWI'&&h()<.72)v=V[2];
+      put(hp(wdk),tm(),V.indexOf(v),Math.round(Math.pow(10,CEN[v[1]]+(h()-.5)*1.2)/1000)*1000,u,hp(A))}
+    for(let c=0;c<INT[k];c++){const typ=(c+k)%6,d=hp(wdk),u=hp(['ANDI','BUDI','CITRA','EKO']),a=hp(A),vi=Math.floor(h()*10);
+      const late=()=>hp(['22:','23:','05:'])+p2(Math.floor(h()*60));
+      if(typ===0){const amt=Math.round(26e6+h()*14e6)+1350;put(d,tm(),vi,amt,u,a);put(d,tm(),vi,amt,u,a)}       // duplicate + split
+      else if(typ===1){[0,1,2].forEach(()=>put(d,tm(),vi,Math.round(18e6+h()*14e6)+250,u,a))}                // split
+      else if(typ===2)put(hp(wek),late(),vi,Math.round(4e6+h()*30e6),u,u);                                   // weekend + jam + SoD
+      else if(typ===3)put(d,late(),vi,Math.round(3e6+h()*20e6),u,a);                                         // di luar jam kerja
+      else if(typ===4)put(d,tm(),vi,Math.round(45.5e6+h()*4e6),u,u);                                         // SoD + mendekati batas
+      else put(hp(wek),tm(),vi,Math.round(45.5e6+h()*4e6),u,a)}                                             // weekend + mendekati batas
+    if(k>=3)put(hp(wdk),tm(),9,k===3?75000000:120000000,'ANDI','RINA','Jasa konsultan')}
   tx.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
   tx.forEach((t,i)=>t.id='TRX'+String(i+1).padStart(4,'0'));
   return tx;
@@ -511,14 +552,30 @@ const chips=f=>f.map(x=>`<span class="chip ${RULE[x.r].g}">${esc(RULE[x.r].name)
 const pill=r=>r.level?`<span class="pill ${r.level}">${r.score} · ${LV[r.level]}</span>`:'<span class="muted small">—</span>';
 function hbars(items,max){max=max||Math.max(1,...items.map(i=>i.v));return `<div class="hbar">${items.map(i=>`<div class="nm" title="${esc(i.l)}">${esc(i.l)}</div><div class="track"><div class="fill" style="width:${(100*i.v/max).toFixed(1)}%;background:${i.c||'var(--accent)'}"></div></div><div class="n">${i.t!=null?i.t:i.v}</div>`).join('')}</div>`}
 
+/* Tren risiko per bulan */
+function monthly(R){const m=new Map();for(const r of R){const k=(r.date||'').slice(0,7);if(!/^\d{4}-\d{2}$/.test(k))continue;if(!m.has(k))m.set(k,{k,n:0,amt:0,T:0,S:0,R:0,exp:0});const o=m.get(k);o.n++;o.amt+=r.amount;if(r.level){o[r.level]++;if(r.level!=='R')o.exp+=r.amount}}
+  return [...m.values()].sort((a,b)=>a.k.localeCompare(b.k)).slice(-12).map(o=>Object.assign(o,{fl:o.T+o.S+o.R}))}
+const mLbl=k=>BLN[+k.slice(5)-1].slice(0,3)+' '+k.slice(2,4);
+const mLong=k=>BLN[+k.slice(5)-1]+' '+k.slice(0,4);
+function trendNote(M){if(M.length<2)return '';const a=M[M.length-2],b=M[M.length-1];
+  const d=(x,y,f)=>y===x?`tetap ${f(y)}`:`${y>x?'naik':'turun'} dari ${f(x)} menjadi ${f(y)}`;
+  const ra=+(100*a.fl/a.n).toFixed(1),rb=+(100*b.fl/b.n).toFixed(1);
+  return `Dibanding ${mLong(a.k)}, transaksi berisiko tinggi pada ${mLong(b.k)} ${d(a.T,b.T,String)}, dan tingkat transaksi berpola ${d(ra,rb,x=>x.toFixed(1).replace('.',',')+'%')}.`}
+function trendChart(M,col){
+  const mx=Math.max(1,...M.map(o=>o.fl));
+  const bars=M.map(o=>{const seg=['T','S','R'].filter(k=>o[k]).map(k=>`<span style="height:${100*o[k]/o.fl}%;background:${col[k]}"></span>`).join('');
+    return `<div class="mc" tabindex="0"><div class="tip"><b>${mLong(o.k)}</b>${o.n.toLocaleString('id-ID')} transaksi · ${rps(o.amt)}<br>Berpola: ${o.fl} (${pct(o.fl,o.n)})<br><i style="background:${col.T}"></i>Tinggi ${o.T}<br><i style="background:${col.S}"></i>Sedang ${o.S}<br><i style="background:${col.R}"></i>Rendah ${o.R}<br>Nilai terpapar: ${rps(o.exp)}</div><div class="mv">${o.fl}</div><div class="mb" style="height:${100*o.fl/mx}%">${seg}</div></div>`}).join('');
+  return `<div class="mt"><div class="mt-plot">${bars}</div><div class="mt-x">${M.map(o=>`<span><b>${mLbl(o.k)}</b>${pct(o.fl,o.n)}</span>`).join('')}</div></div>`}
+
 function vRingkasan(){
   const R=S.res.rows,fl=R.filter(r=>r.score>0),tot=R.reduce((s,r)=>s+r.amount,0);
   const cnt={T:0,S:0,R:0};fl.forEach(r=>cnt[r.level]++);
   const exp=fl.filter(r=>r.level!=='R').reduce((s,r)=>s+r.amount,0);
   const byRule=RULES.filter(r=>cfg.on[r.id]).map(r=>({l:r.name,v:fl.filter(x=>x.flags.some(f=>f.r===r.id)).length,c:GROUPS[r.g].c}));
-  // timeline
-  const days=[...new Set(R.map(r=>r.date))].sort();let tlHtml='',xs='';
-  if(days.length){const d0=Date.parse(days[0]),d1=Date.parse(days[days.length-1]);const n=Math.min(62,Math.round((d1-d0)/864e5)+1);const all=[];
+  const M=monthly(R);
+  // timeline (maks. 61 hari terakhir)
+  const days=[...new Set(R.map(r=>r.date))].sort();let tlHtml='',xs='',tlCut=false;
+  if(days.length){const d1=Date.parse(days[days.length-1]);let d0=Date.parse(days[0]);if((d1-d0)/864e5>60){d0=d1-60*864e5;tlCut=true}const n=Math.round((d1-d0)/864e5)+1;const all=[];
     for(let i=0;i<n;i++){const ds=new Date(d0+i*864e5).toISOString().slice(0,10);const a=R.filter(r=>r.date===ds);all.push({ds,nf:a.filter(r=>!r.score).length,fl:a.filter(r=>r.score>0).length})}
     const mx=Math.max(1,...all.map(a=>a.nf+a.fl));
     tlHtml=all.map(a=>`<div class="col${dow(a.ds)%6?'':' we'}" title="${fdate(a.ds)}: ${a.nf+a.fl} transaksi, ${a.fl} berpola"><span class="nf" style="height:${100*a.nf/mx}%"></span><span class="fl" style="height:${100*a.fl/mx}%"></span></div>`).join('');
@@ -528,7 +585,8 @@ function vRingkasan(){
   // top case
   const top=[...fl].sort((a,b)=>b.score-a.score||b.flags.length-a.flags.length)[0];
   let caseHtml='<p class="muted">Belum ada pola yang terdeteksi.</p>';
-  if(top){const rel=R.filter(r=>r.vendor===top.vendor&&dayDiff(r,top)<=4).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).slice(0,8);
+  if(top){const near=R.filter(r=>r.vendor===top.vendor&&dayDiff(r,top)<=4).sort((a,b)=>(b.score>0)-(a.score>0)||dayDiff(a,top)-dayDiff(b,top));
+    const rel=near.slice(0,8).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
     const rs=[...new Set(rel.flatMap(r=>r.flags.map(f=>f.r)))];
     const ind=rs.includes('DUP')&&rs.includes('SPLIT')?'duplicate payment / pemecahan transaksi':rs.includes('DUP')?'duplicate payment':rs.includes('SPLIT')?'pemecahan transaksi untuk menghindari otorisasi':rs.includes('OUT')?'nominal tidak wajar dibanding kategori':rs.includes('SOD')?'pelanggaran segregation of duties':'penyimpangan pola transaksi';
     caseHtml=`<div class="case"><div class="tw"><table><thead><tr><th>ID</th><th>Vendor</th><th class="r">Jumlah</th><th>Tanggal</th><th>Skor</th></tr></thead><tbody>${rel.map(r=>`<tr class="${r.score>0?'hit':''}"><td class="mono">${r.id}</td><td>${esc(r.vendor)}</td><td class="r num">${rp(r.amount)}</td><td>${fdate(r.date)}</td><td>${pill(r)}</td></tr>`).join('')}</tbody></table></div>
@@ -544,11 +602,15 @@ function vRingkasan(){
   </div>
   <div class="panel"><h3>Sebaran tingkat risiko</h3><p class="sub">Proporsi transaksi menurut skor. Bagian kosong = transaksi tanpa pola.</p><div class="seg">${segs}</div>
    <div class="legend"><span><i style="background:var(--high)"></i>Tinggi ${cnt.T}</span><span><i style="background:var(--med)"></i>Sedang ${cnt.S}</span><span><i style="background:var(--low)"></i>Rendah ${cnt.R}</span><span><i style="background:var(--sunk);border:1px solid var(--line)"></i>Normal ${R.length-fl.length}</span></div></div>
+  <div class="panel"><h3>Tren risiko per bulan</h3><p class="sub">${M.length<2?'Data baru mencakup 1 bulan. Tren akan terlihat setelah data berisi minimal 2 bulan.':'Jumlah transaksi berpola per bulan menurut tingkat risiko. Angka di atas batang = jumlah temuan; persentase di bawah bulan = porsi transaksi berpola. Arahkan kursor ke batang untuk rincian.'}</p>
+   ${M.length?trendChart(M,{T:'var(--high)',S:'var(--med)',R:'var(--low)'}):''}
+   <div class="legend"><span><i style="background:var(--high)"></i>Tinggi</span><span><i style="background:var(--med)"></i>Sedang</span><span><i style="background:var(--low)"></i>Rendah</span></div>
+   ${M.length>1?`<p class="small" style="margin:10px 0 0">${trendNote(M)}</p>`:''}</div>
   <div class="panel"><h3>Ilustrasi kasus: dari transaksi biasa menjadi temuan pola mencurigakan</h3><p class="sub">Kluster transaksi di sekitar temuan dengan skor tertinggi (vendor sama, ±4 hari). Baris berwarna adalah transaksi yang ditandai.</p>${caseHtml}</div>
   <div class="grid g2">
     <div class="panel"><h3>Temuan per jenis pola</h3><p class="sub">Jumlah transaksi yang memicu tiap aturan. Satu transaksi dapat memicu beberapa aturan.</p>${hbars(byRule)}
       <div class="legend">${Object.values(GROUPS).map(g=>`<span><i style="background:${g.c}"></i>${g.label}</span>`).join('')}</div></div>
-    <div class="panel"><h3>Timeline harian</h3><p class="sub">Volume transaksi per hari; merah = transaksi berpola, abu-abu = akhir pekan.</p><div class="tl">${tlHtml}</div><div class="tl-x">${xs}</div>
+    <div class="panel"><h3>Timeline harian</h3><p class="sub">Volume transaksi per hari${tlCut?' (61 hari terakhir)':''}; merah = transaksi berpola, abu-abu = akhir pekan.</p><div class="tl">${tlHtml}</div><div class="tl-x">${xs}</div>
       <div class="legend"><span><i style="background:var(--high)"></i>Berpola</span><span><i style="background:color-mix(in srgb,var(--accent) 28%,var(--sunk))"></i>Normal</span></div></div>
   </div>
   <div class="panel"><h3>Vendor dengan akumulasi skor risiko tertinggi</h3><p class="sub">Jumlah skor seluruh transaksi berpola per vendor.</p>
@@ -796,7 +858,11 @@ function reportWb(){
   const ws3=XLSX.utils.aoa_to_sheet(B);[2,3,4].forEach(c=>fmtCells(ws3,c,'0.0%',5));fmtCells(ws3,5,'0.00',5);const mc=ws3['B3'];if(mc)mc.z='0.0000';ws3['!cols']=[{wch:30},{wch:10},{wch:10},{wch:16},{wch:10},{wch:10},{wch:22}];
   const C=[['PARAMETER MESIN DETEKSI'],[],['Parameter','Nilai']].concat(PARAMS.map(([k,l])=>[l,cfg[k]]),[[],['Aturan','Kelompok','Aktif','Bobot']],RULES.map(r=>[r.name,GROUPS[r.g].label,cfg.on[r.id]?'Ya':'Tidak',cfg.w[r.id]]));
   const ws4=XLSX.utils.aoa_to_sheet(C);fmtCells(ws4,1,'#,##0.##',3);ws4['!cols']=[{wch:36},{wch:22},{wch:8},{wch:8}];
-  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws1,'Ringkasan');XLSX.utils.book_append_sheet(wb,ws2,'Daftar Temuan');XLSX.utils.book_append_sheet(wb,ws3,'Benford');XLSX.utils.book_append_sheet(wb,ws4,'Parameter');
+  const MM=monthly(R),TR=[['TREN RISIKO PER BULAN'],[],['Bulan','Transaksi','Nilai transaksi (Rp)','Transaksi berpola','Persentase berpola','Risiko tinggi','Risiko sedang','Risiko rendah','Nilai terpapar tinggi + sedang (Rp)']]
+    .concat(MM.map(o=>[mLong(o.k),o.n,o.amt,o.fl,o.n?o.fl/o.n:0,o.T,o.S,o.R,o.exp]));
+  if(MM.length>1)TR.push([],[trendNote(MM)]);
+  const ws5=XLSX.utils.aoa_to_sheet(TR);[2,8].forEach(c=>fmtCells(ws5,c,'#,##0',3));fmtCells(ws5,4,'0.0%',3);ws5['!cols']=[{wch:16},{wch:11},{wch:20},{wch:16},{wch:17},{wch:13},{wch:13},{wch:13},{wch:30}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws1,'Ringkasan');XLSX.utils.book_append_sheet(wb,ws5,'Tren Bulanan');XLSX.utils.book_append_sheet(wb,ws2,'Daftar Temuan');XLSX.utils.book_append_sheet(wb,ws3,'Benford');XLSX.utils.book_append_sheet(wb,ws4,'Parameter');
   return wb;
 }
 function exportReport(){try{const wb=reportWb();const fn=`Laporan-Temuan-Pattern-Recognition-${today()}.xlsx`;XLSX.writeFile(wb,fn);toast('Laporan diunduh: '+fn)}catch(e){toast(e.message,true)}}
@@ -838,16 +904,17 @@ function reportPages(){
   if(vend[0])msgs.push(`Vendor dengan akumulasi risiko tertinggi: <b>${esc(vend[0].v)}</b> (${vend[0].n} transaksi berpola, ${rps(vend[0].amt)}).`);
   msgs.push(`Uji Benford's Law atas ${b.n} nominal: <b>${conf}</b> (MAD ${b.mad.toFixed(4).replace('.',',')}).`);
   msgs.push(`Tindak lanjut: <b>${followed} dari ${fl.length}</b> temuan sudah diproses (status selain "Baru").`);
-  // timeline
-  let tl='',tlx='';
-  if(ds.length){const d0=Date.parse(ds[0]),n=Math.min(62,Math.round((Date.parse(ds[ds.length-1])-d0)/864e5)+1),all=[];
+  const M=monthly(R);if(M.length>1)msgs.splice(2,0,trendNote(M).replace(/transaksi berisiko tinggi/,'<b>transaksi berisiko tinggi</b>'));
+  // timeline (maks. 61 hari terakhir)
+  let tl='',tlx='',tlCut=false;
+  if(ds.length){const d1=Date.parse(ds[ds.length-1]);let d0=Date.parse(ds[0]);if((d1-d0)/864e5>60){d0=d1-60*864e5;tlCut=true}const n=Math.round((d1-d0)/864e5)+1,all=[];
     for(let i=0;i<n;i++){const d=new Date(d0+i*864e5).toISOString().slice(0,10);const a=R.filter(r=>r.date===d);all.push({d,nf:a.filter(r=>!r.score).length,f:a.filter(r=>r.score>0).length})}
     const mx=Math.max(1,...all.map(a=>a.nf+a.f));
     tl=all.map(a=>`<div><span style="height:${100*a.nf/mx}%;background:${dow(a.d)%6?'#9FB4D9':'#D1D3D4'}"></span><span style="height:${100*a.f/mx}%;background:#D64535"></span></div>`).join('');
     tlx=all.map((a,i)=>`<span>${i%5===0?+a.d.slice(8):''}</span>`).join('')}
   const mxR=Math.max(1,...byRule.map(x=>x.n));
   const rows=(a,i0)=>a.map((r,i)=>`<tr><td class="c">${i0+i+1}</td><td>${esc(r.id)}</td><td>${fShort(r.date)}</td><td>${esc(r.vendor)}</td><td class="r">${rp(r.amount)}</td><td>${esc(r.maker)} → ${esc(r.approver)}</td><td class="c"><span class="pl ${r.level}">${r.score}</span></td><td>${esc(r.flags.map(f=>RULE[f.r].name).join(', '))}</td><td>${esc(S.status[r.id]||'Baru')}</td></tr>`).join('');
-  const colg='<colgroup><col style="width:24px"><col style="width:56px"><col style="width:58px"><col style="width:108px"><col style="width:84px"><col style="width:102px"><col style="width:34px"><col><col style="width:70px"></colgroup>';
+  const colg='<colgroup><col style="width:24px"><col style="width:56px"><col style="width:66px"><col style="width:108px"><col style="width:84px"><col style="width:102px"><col style="width:34px"><col><col style="width:70px"></colgroup>';
   const head='<thead><tr><th class="c">No</th><th>ID</th><th>Tanggal</th><th>Vendor</th><th class="r">Jumlah</th><th>Pembuat → Penyetuju</th><th class="c">Skor</th><th>Pola terdeteksi</th><th>Status</th></tr></thead>';
   const APP=34,chunks=[];for(let i=10;i<fl.length;i+=APP)chunks.push([i,fl.slice(i,i+APP)]);
   const N=2+chunks.length;
@@ -881,7 +948,10 @@ function reportPages(){
       <div class="st" style="margin-top:16px">Status tindak lanjut <small>${pct(followed,fl.length)} diproses</small></div>
       <div class="bars" style="grid-template-columns:128px 1fr 26px">${st.map(x=>`<div>${x.s}</div><div class="t"><div class="f" style="width:${fl.length?100*x.n/fl.length:0}%;background:${x.s==='Baru'?'#9FB4D9':x.s==='Investigasi'?'#E89A2C':x.s==='Temuan valid'?'#D64535':'#3AA676'}"></div></div><div class="n">${x.n}</div>`).join('')}</div></div>
     </div>
-    <div class="sec"><div class="st">Timeline transaksi harian <small>merah = berpola · abu-abu = akhir pekan</small></div><div class="tl">${tl}</div><div class="tlx">${tlx}</div></div>
+    ${M.length>1?`<div class="sec two" style="grid-template-columns:1fr 1.25fr">
+     <div><div class="st">Tren risiko per bulan <small>${M.length} bulan · % = porsi berpola</small></div>${trendChart(M,LVC)}<div class="lg" style="grid-template-columns:repeat(3,auto);justify-content:start;gap:14px">${['T','S','R'].map(k=>`<div><i style="background:${LVC[k]}"></i>${LV[k]}</div>`).join('')}</div></div>
+     <div><div class="st">Timeline harian <small>${tlCut?'61 hari terakhir · ':''}merah = berpola</small></div><div class="tl">${tl}</div><div class="tlx">${tlx}</div></div></div>`
+    :`<div class="sec"><div class="st">Timeline transaksi harian <small>merah = berpola · abu-abu = akhir pekan</small></div><div class="tl">${tl}</div><div class="tlx">${tlx}</div></div>`}
    </div>${ft(1)}</div>`;
   const page2=`<div class="pg">${strip('Prioritas dan rekomendasi')}
    <div class="in">
