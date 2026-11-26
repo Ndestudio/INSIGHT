@@ -6,9 +6,10 @@ Aplikasi web satu halaman untuk Internal Audit InJourney Aviation Services. Apli
 
 - **Ringkasan**: angka utama, sebaran tingkat risiko, timeline harian, ilustrasi kasus teratas, dan vendor dengan skor tertinggi.
 - **Temuan**: daftar transaksi berpola dengan filter, alasan per aturan, status tindak lanjut, dan salin CSV.
+- **Export laporan (Excel)**: dari menu Ringkasan atau Temuan, unduh rekap temuan dalam satu file `.xlsx` berisi 4 sheet: *Ringkasan* (indikator utama, temuan per pola, status tindak lanjut, vendor berisiko), *Daftar Temuan* (seluruh transaksi berpola beserta skor, pola, alasan, dan status), *Benford*, dan *Parameter* mesin deteksi yang dipakai.
 - **Benford's Law**: uji digit pertama dengan MAD (ambang Nigrini) dan z-stat per digit.
 - **Relasi & Perilaku**: matriks pembuat × vendor, profil penyetuju (SoD), vendor favorit, aktivitas di luar jam kerja.
-- **Sumber Data**: unggah atau tempel CSV. Data diproses di browser dan tidak dikirim ke server.
+- **Sumber Data**: unggah file Excel (`.xlsx`/`.xls`) atau CSV, atau tempel teks CSV. Data diproses di browser dan tidak dikirim ke server.
 - **Mesin Deteksi**: parameter dan bobot 9 aturan dapat diubah.
 
 | Kelompok | Aturan |
@@ -19,18 +20,22 @@ Aplikasi web satu halaman untuk Internal Audit InJourney Aviation Services. Apli
 
 ## Cara membuka
 
-- **Di komputer:** klik dua kali `index.html`, atau seret ke jendela browser (Chrome, Edge, Firefox). Tidak perlu instalasi atau server. Koneksi internet hanya dipakai untuk memuat font Montserrat.
+- **Di komputer:** klik dua kali `index.html`, atau seret ke jendela browser (Chrome, Edge, Firefox). Tidak perlu instalasi atau server. Koneksi internet dipakai untuk memuat font Montserrat dan pembaca Excel (SheetJS). Tanpa internet, aplikasi tetap jalan dengan file CSV.
 - **Lewat web:** aktifkan GitHub Pages (Settings → Pages → Deploy from a branch → `main` / root). Aplikasi lalu bisa dibuka di `https://ndestudio.github.io/INSIGHT/`.
 
-## Format CSV
+## Format data (Excel atau CSV)
 
 Kolom wajib: `tanggal`, `vendor`, `jumlah`. Opsional: `id`, `jam`, `pembuat`, `penyetuju`, `kategori`, `keterangan`.
 
-Pemisah kolom boleh koma, titik koma, atau tab. Tanggal `YYYY-MM-DD` atau `DD/MM/YYYY`. Nominal boleh `49000000` atau `49.000.000`.
+- **Excel:** data dibaca dari sheet bernama *Transaksi* (atau sheet pertama). Kolom tanggal dan jam boleh berformat tanggal/jam Excel biasa.
+- **CSV:** pemisah kolom boleh koma, titik koma, atau tab. Tanggal `YYYY-MM-DD` atau `DD/MM/YYYY`. Nominal boleh `49000000` atau `49.000.000`.
 
 ### Template siap pakai
 
-[`template-transaksi.csv`](template-transaksi.csv) berisi 31 transaksi contoh (fiktif) yang memicu kesembilan aturan. File ini memakai pemisah titik koma dan UTF-8 sehingga langsung terbuka rapi di Excel berbahasa Indonesia. Tombol **Unduh template CSV** juga tersedia di menu Sumber Data aplikasi.
+- [`template-transaksi.xlsx`](template-transaksi.xlsx) **(disarankan)**: sheet *Transaksi* berisi 31 transaksi contoh (fiktif) dengan format tanggal, jam, dan Rupiah, plus sheet *Petunjuk* yang menjelaskan setiap kolom. Tombol **Unduh template Excel** di menu Sumber Data menghasilkan file yang sama.
+- [`template-transaksi.csv`](template-transaksi.csv): isi yang sama dalam CSV (pemisah titik koma, UTF-8).
+
+Kedua template memicu kesembilan aturan deteksi:
 
 | Baris contoh | Pola yang diperagakan |
 |---|---|
@@ -46,13 +51,14 @@ Pemisah kolom boleh koma, titik koma, atau tab. Tanggal `YYYY-MM-DD` atau `DD/MM
 | TRX-002, 020, 021, 024, 025 | Vendor favorit (semua transaksi DEWI ke PT Data Prima) |
 | Baris lainnya | Transaksi normal sebagai pembanding |
 
-Cara pakai: buka template di Excel, hapus baris contoh, isi data Anda dengan kolom yang sama, lalu **Save As → CSV (Comma delimited)** atau CSV UTF-8, dan unggah di menu Sumber Data.
+Cara pakai: buka `template-transaksi.xlsx`, hapus baris contoh di sheet *Transaksi*, isi data Anda dengan kolom yang sama, simpan, lalu klik **Unggah Excel / CSV** di menu Sumber Data.
 
 ## Struktur file
 
 | File | Isi |
 |---|---|
 | `index.html` | Seluruh aplikasi (HTML, CSS, JavaScript) |
+| `template-transaksi.xlsx` | Template unggah Excel (sheet Transaksi + Petunjuk) |
 | `template-transaksi.csv` | Template unggah CSV berisi 31 transaksi contoh |
 | `ias-logo-white.png` | Logo IAS versi putih |
 | `hero-globe.jpg` | Gambar globe untuk header |

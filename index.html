@@ -258,6 +258,10 @@ pre.code{background:rgba(6,10,34,.6)}
 .note{background:rgba(4,176,192,.09);border-left-color:var(--brand-tosca)}
 .note b{color:var(--tosca-ink)}
 .found{background:rgba(255,107,94,.05)}
+.toast{position:fixed;z-index:50;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));max-width:min(520px,calc(100% - 32px));padding:12px 16px;border-radius:10px;background:var(--surface-solid);border:1px solid rgba(4,176,192,.5);box-shadow:0 0 24px rgba(4,176,192,.3);font-weight:500}
+.toast.err{border-color:var(--high);box-shadow:0 0 24px rgba(255,107,94,.3);color:var(--high)}
+.btn.xl{border-color:rgba(79,211,154,.55)}
+.btn.xl::before{content:"";width:14px;height:14px;border-radius:3px;background:linear-gradient(135deg,#1D9E5C,#4FD39A);box-shadow:inset 0 0 0 3px rgba(255,255,255,.25)}
 </style>
 </head>
 <body>
@@ -293,6 +297,8 @@ pre.code{background:rgba(6,10,34,.6)}
   <main id="main"></main>
 </div>
 
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 (function(){
 "use strict";
@@ -431,7 +437,7 @@ function vRingkasan(){
     caseHtml=`<div class="case"><div class="tw"><table><thead><tr><th>ID</th><th>Vendor</th><th class="r">Jumlah</th><th>Tanggal</th><th>Skor</th></tr></thead><tbody>${rel.map(r=>`<tr class="${r.score>0?'hit':''}"><td class="mono">${r.id}</td><td>${esc(r.vendor)}</td><td class="r num">${rp(r.amount)}</td><td>${fdate(r.date)}</td><td>${pill(r)}</td></tr>`).join('')}</tbody></table></div>
     <div class="found"><h4>Pola yang terdeteksi</h4><ul>${rs.map(x=>`<li>${esc(RULE[x].name)}</li>`).join('')}<li>${esc(top.vendor)} · ${rel.filter(r=>r.score>0).length} transaksi berdekatan</li></ul><div class="ind"><mark>Indikasi:</mark> ${ind}. Lanjutkan ke investigasi dan konfirmasi dokumen pendukung.</div></div></div>`}
   const segs=[['T','var(--high)'],['S','var(--med)'],['R','var(--low)']].map(([k,c])=>`<span style="width:${100*cnt[k]/R.length}%;background:${c}" title="${LV[k]}: ${cnt[k]}"></span>`).join('');
-  return `<section class="view"><div class="vh"><div><h2>Ringkasan Audit Intelligence</h2><p>Population-based auditing: seluruh transaksi diuji terhadap ${RULES.filter(r=>cfg.on[r.id]).length} aturan pola, lalu diberi skor risiko 0–100.</p></div><a class="btn pri" href="#temuan">Tinjau temuan →</a></div>
+  return `<section class="view"><div class="vh"><div><h2>Ringkasan Audit Intelligence</h2><p>Population-based auditing: seluruh transaksi diuji terhadap ${RULES.filter(r=>cfg.on[r.id]).length} aturan pola, lalu diberi skor risiko 0–100.</p></div><div class="row"><button class="btn xl" id="expXlsx">Export laporan (Excel)</button><a class="btn pri" href="#temuan">Tinjau temuan →</a></div></div>
   <div class="kpis">
     <div class="kpi"><div class="k">Transaksi dianalisis</div><div class="v">${R.length.toLocaleString('id-ID')}</div><div class="d">100% populasi, bukan sampel</div></div>
     <div class="kpi"><div class="k">Nilai transaksi</div><div class="v">${rps(tot)}</div><div class="d">${groupBy(R,r=>r.vendor).size} vendor · ${groupBy(R,r=>r.maker).size} pembuat</div></div>
@@ -459,7 +465,7 @@ const STS=['Baru','Investigasi','Temuan valid','Bukan fraud (dijelaskan)'];
 function vTemuan(){
   const rows=filtered(),f=S.f,all=S.res.rows.filter(r=>r.score>0);
   const stc=Object.fromEntries(STS.map(s=>[s,all.filter(r=>(S.status[r.id]||'Baru')===s).length]));
-  return `<section class="view"><div class="vh"><div><h2>Temuan pola</h2><p>Daftar transaksi berpola, diurutkan dari skor tertinggi. Klik baris untuk melihat alasan setiap aturan. Status tindak lanjut tersimpan di browser Anda.</p></div><button class="btn" id="copyCsv">Salin CSV temuan</button></div>
+  return `<section class="view"><div class="vh"><div><h2>Temuan pola</h2><p>Daftar transaksi berpola, diurutkan dari skor tertinggi. Klik baris untuk melihat alasan setiap aturan. Status tindak lanjut tersimpan di browser Anda.</p></div><div class="row"><button class="btn pri" id="expXlsx">Export laporan (Excel)</button><button class="btn" id="copyCsv">Salin CSV temuan</button></div></div>
   <div class="kpis">${STS.map(s=>`<div class="kpi"><div class="k">${s}</div><div class="v">${stc[s]}</div></div>`).join('')}</div>
   <div class="panel"><div class="row" style="margin-bottom:12px">
     <label class="field">Tingkat risiko<select id="fLv"><option value="">Semua</option>${Object.entries(LV).map(([k,v])=>`<option value="${k}"${f.lv===k?' selected':''}>${v}</option>`).join('')}</select></label>
@@ -512,24 +518,26 @@ function vRelasi(){
 const TEMPLATE='id,tanggal,jam,vendor,jumlah,pembuat,penyetuju,kategori,keterangan\nTRX001,2026-11-03,10:12,PT Sinar Abadi,49000000,BUDI,HADI,Pengadaan,Pembelian material\nTRX002,2026-11-03,14:47,PT Sinar Abadi,49000000,BUDI,HADI,Pengadaan,Pembelian material';
 function vData(){
   const m=S.msg;
-  return `<section class="view"><div class="vh"><div><h2>Sumber data</h2><p>Unggah ekstrak transaksi dari GL / core banking, payment, atau procurement dalam format CSV. Data diproses di browser Anda dan tidak dikirim ke server mana pun.</p></div></div>
+  return `<section class="view"><div class="vh"><div><h2>Sumber data</h2><p>Unggah ekstrak transaksi dari GL / core banking, payment, atau procurement dalam format Excel (.xlsx) atau CSV. Data diproses di browser Anda dan tidak dikirim ke server mana pun.</p></div></div>
   ${m?`<div class="msg ${m.t}">${esc(m.s)}</div>`:''}
   <div class="grid g2">
    <div class="panel"><h3>Muat data</h3><p class="sub">Sumber aktif: ${esc(S.src)}</p>
-    <div class="row"><label class="btn pri" for="fileIn">Unggah CSV</label><input type="file" id="fileIn" accept=".csv,.txt,text/csv" hidden><button class="btn" id="loadSample">Muat data contoh</button><a class="btn" href="template-transaksi.csv" download="template-transaksi.csv">Unduh template CSV</a></div>
-    <p class="small muted" style="margin:10px 0 0">Template berisi 31 transaksi contoh (pemisah titik koma, bisa dibuka di Excel). Ganti isinya dengan data Anda, simpan sebagai CSV, lalu unggah.</p>
+    <div class="row"><label class="btn pri" for="fileIn">Unggah Excel / CSV</label><input type="file" id="fileIn" accept=".xlsx,.xls,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" hidden><button class="btn xl" id="dlTplX">Unduh template Excel</button><button class="btn" id="loadSample">Muat data contoh</button></div>
+    <ol class="small muted" style="margin:12px 0 0;padding-left:18px;display:grid;gap:3px"><li>Klik <b>Unduh template Excel</b>. File berisi sheet <b>Transaksi</b> (31 contoh) dan sheet <b>Petunjuk</b>.</li><li>Hapus baris contoh, lalu isi data Anda di bawah judul kolom yang sama.</li><li>Simpan, lalu klik <b>Unggah Excel / CSV</b> dan pilih file tersebut.</li></ol>
+    <p class="small muted" style="margin:10px 0 0">Lebih suka CSV? <a href="template-transaksi.csv" download="template-transaksi.csv" style="color:var(--tosca-ink)">Unduh template CSV</a>.</p>
     <p class="small muted" style="margin:14px 0 6px">Atau tempel isi CSV di sini:</p><textarea id="pasteIn" placeholder="${esc(TEMPLATE.split('\n')[0])}"></textarea>
     <div class="row" style="margin-top:8px"><button class="btn" id="parsePaste">Proses teks</button></div></div>
-   <div class="panel"><h3>Format kolom</h3><p class="sub">Wajib: <b>tanggal</b>, <b>vendor</b>, <b>jumlah</b>. Opsional: id, jam, pembuat, penyetuju, kategori, keterangan. Pemisah koma, titik koma, atau tab. Tanggal YYYY-MM-DD atau DD/MM/YYYY; nominal boleh "49.000.000".</p>
-    <pre class="code" id="tpl">${esc(TEMPLATE)}</pre><div class="row" style="margin-top:8px"><button class="btn" id="copyTpl">Salin template</button><a class="btn" href="template-transaksi.csv" download="template-transaksi.csv">Unduh template CSV</a><span id="tplMsg" class="small muted"></span></div>
+   <div class="panel"><h3>Format kolom</h3><p class="sub">Wajib: <b>tanggal</b>, <b>vendor</b>, <b>jumlah</b>. Opsional: id, jam, pembuat, penyetuju, kategori, keterangan. Di Excel, kolom tanggal dan jam boleh berformat tanggal/jam biasa. Untuk CSV: pemisah koma, titik koma, atau tab; tanggal YYYY-MM-DD atau DD/MM/YYYY; nominal boleh "49.000.000".</p>
+    <pre class="code" id="tpl">${esc(TEMPLATE)}</pre><div class="row" style="margin-top:8px"><button class="btn" id="copyTpl">Salin contoh CSV</button><span id="tplMsg" class="small muted"></span></div>
     <p class="small muted">Nama kolom alternatif dikenali, misalnya amount/nominal, date/tgl, supplier, maker/user, approver/checker, category/akun.</p></div>
   </div>
   <div class="panel"><h3>Pratinjau data</h3><p class="sub">50 baris pertama dari ${S.tx.length} transaksi.</p><div class="tw" style="max-height:420px"><table><thead><tr><th>ID</th><th>Tanggal</th><th>Jam</th><th>Vendor</th><th class="r">Jumlah</th><th>Pembuat</th><th>Penyetuju</th><th>Kategori</th><th>Keterangan</th></tr></thead><tbody>
   ${S.tx.slice(0,50).map(t=>`<tr><td class="mono">${esc(t.id)}</td><td class="mono">${esc(t.date)}</td><td class="mono">${esc(t.time)}</td><td>${esc(t.vendor)}</td><td class="r num">${rp(t.amount)}</td><td>${esc(t.maker)}</td><td>${esc(t.approver)}</td><td>${esc(t.cat)}</td><td>${esc(t.desc)}</td></tr>`).join('')}</tbody></table></div></div></section>`}
 
+const PARAMS=[['threshold','Batas otorisasi (Rp)',1000000],['nearPct','Ambang "mendekati batas" (%)',1],['dupDays','Jendela duplikat (hari)',1],['splitDays','Jendela split (hari)',1],['splitMinPct','Min. nominal per trx split (% batas)',5],['roundMod','Kelipatan nominal bulat (Rp)',1000000],['roundMin','Minimum nominal bulat (Rp)',1000000],['hStart','Jam kerja mulai',1],['hEnd','Jam kerja selesai',1],['favPct','Ambang vendor favorit (%)',5],['favMin','Min. transaksi per pembuat',1],['zThr','Ambang robust z-score',.5]];
 function vMesin(){
   const fl=S.res.rows;const n=id=>fl.filter(r=>r.flags.some(f=>f.r===id)).length;
-  const P=[['threshold','Batas otorisasi (Rp)',1000000],['nearPct','Ambang "mendekati batas" (%)',1],['dupDays','Jendela duplikat (hari)',1],['splitDays','Jendela split (hari)',1],['splitMinPct','Min. nominal per trx split (% batas)',5],['roundMod','Kelipatan nominal bulat (Rp)',1000000],['roundMin','Minimum nominal bulat (Rp)',1000000],['hStart','Jam kerja mulai',1],['hEnd','Jam kerja selesai',1],['favPct','Ambang vendor favorit (%)',5],['favMin','Min. transaksi per pembuat',1],['zThr','Ambang robust z-score',.5]];
+  const P=PARAMS;
   return `<section class="view"><div class="vh"><div><h2>Mesin deteksi</h2><p>Atur parameter dan bobot setiap aturan. Skor risiko transaksi = jumlah bobot aturan yang terpicu (maks. 100): ≥ 50 tinggi, 25–49 sedang, 1–24 rendah. Perubahan langsung diterapkan.</p></div><button class="btn" id="resetCfg">Kembalikan default</button></div>
   <div class="panel"><h3>Parameter</h3><p class="sub">Sesuaikan dengan kebijakan otorisasi dan jam operasional organisasi Anda.</p><div class="params">
    ${P.map(([k,l,s])=>`<label class="field">${l}<input type="number" class="cfg" id="cfg-${k}" data-k="${k}" step="${s}" min="0" value="${cfg[k]}"></label>`).join('')}</div></div>
@@ -575,8 +583,9 @@ function parseCSV(text){text=text.replace(/^﻿/,'');const first=text.split('\n'
 function pAmt(s){s=String(s).replace(/rp|idr|\s/gi,'');if(/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s))s=s.replace(/\./g,'').replace(',','.');else if(/^-?\d{1,3}(,\d{3})+(\.\d+)?$/.test(s))s=s.replace(/,/g,'');else s=s.replace(',','.');return Math.round(parseFloat(s))}
 function pDate(s){s=String(s).trim();let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}:\d{2}))?/);if(m)return [`${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`,m[4]];
   m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})(?:\s+(\d{1,2}:\d{2}))?/);if(m)return [`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`,m[4]];return [null]}
-function importCSV(text,name){
-  const rows=parseCSV(text);if(rows.length<2)throw new Error('File tidak berisi data. Pastikan baris pertama adalah header dan ada minimal satu baris transaksi.');
+function importCSV(text,name){importRows(parseCSV(text),name)}
+function importRows(rows,name){
+  rows=rows.filter(r=>r.some(x=>String(x).trim()));if(rows.length<2)throw new Error('File tidak berisi data. Pastikan baris pertama adalah header dan ada minimal satu baris transaksi.');
   const H=rows[0].map(h=>h.trim().toLowerCase().replace(/[\s\-]+/g,'_'));const idx={};for(const [k,al] of Object.entries(ALI)){const i=H.findIndex(h=>al.includes(h));if(i>=0)idx[k]=i}
   const miss=['date','vendor','amount'].filter(k=>idx[k]==null);if(miss.length)throw new Error('Kolom wajib tidak ditemukan: '+miss.map(k=>ALI[k][0]).join(', ')+'. Header terbaca: '+rows[0].join(', '));
   const tx=[];let bad=0;rows.slice(1).forEach((r,i)=>{const g=k=>idx[k]!=null?(r[idx[k]]||'').trim():'';const [d,tm]=pDate(g('date'));const a=pAmt(g('amount'));if(!d||isNaN(a)){bad++;return}
@@ -586,10 +595,121 @@ function importCSV(text,name){
   const seen=new Set();tx.forEach(t=>{let id=t.id,k=2;while(seen.has(id))id=t.id+'-'+k++;t.id=id;seen.add(id)});
   load(tx,name);S.msg={t:'ok',s:`${tx.length} transaksi dimuat dari ${name}${bad?`, ${bad} baris dilewati karena tanggal/nominal tidak valid`:''}.`};render()}
 
+/* ---------- Excel (SheetJS) ---------- */
+function toast(s,err){const el=$('#toast');if(!el)return;el.textContent=s;el.className='toast'+(err?' err':'');el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>{el.hidden=true},err?7000:4000)}
+function needX(){if(typeof XLSX==='undefined')throw new Error('Fitur Excel butuh koneksi internet untuk memuat pembaca Excel. Periksa koneksi lalu muat ulang halaman, atau gunakan file CSV.')}
+const p2=n=>String(n).padStart(2,'0');
+const ser2d=v=>{const d=new Date(Math.round((Math.floor(v)-25569)*864e5));return `${d.getUTCFullYear()}-${p2(d.getUTCMonth()+1)}-${p2(d.getUTCDate())}`};
+const ser2t=v=>{const m=Math.round((v-Math.floor(v))*1440)%1440;return `${p2(Math.floor(m/60))}:${p2(m%60)}`};
+const d2ser=s=>{const [y,m,d]=s.split('-').map(Number);return Date.UTC(y,m-1,d)/864e5+25569};
+const t2ser=s=>{const [h,m]=s.split(':').map(Number);return (h*60+m)/1440};
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`};
+function xlsxRows(buf){
+  needX();const wb=XLSX.read(buf,{type:'array'});
+  const sn=wb.SheetNames.find(n=>/transaksi|data/i.test(n))||wb.SheetNames[0];
+  const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:''});
+  if(!rows.length)return rows;
+  const H=rows[0].map(h=>String(h).trim().toLowerCase().replace(/[\s\-]+/g,'_'));
+  const ci=k=>H.findIndex(h=>ALI[k].includes(h));const di=ci('date'),ti=ci('time');
+  return rows.map((r,i)=>i===0?r.map(x=>String(x)):r.map((v,j)=>{
+    if(v instanceof Date)v=v.getTime()/864e5+25569;
+    if(typeof v==='number'){if(j===di)return v%1?ser2d(v)+' '+ser2t(v):ser2d(v);if(j===ti)return ser2t(v);return String(v)}
+    return String(v==null?'':v)}));
+}
+function fmtCells(ws,col,z,from){const rg=XLSX.utils.decode_range(ws['!ref']);for(let r=from;r<=rg.e.r;r++){const c=ws[XLSX.utils.encode_cell({r,c:col})];if(c&&c.t==='n')c.z=z}}
+const TPL_CSV=`id;tanggal;jam;vendor;jumlah;pembuat;penyetuju;kategori;keterangan
+TRX-001;2026-11-02;09:15;PT Sinar Abadi;18750000;ANDI;RINA;Pengadaan;Pembelian material bangunan
+TRX-002;2026-11-02;10:40;PT Data Prima;32400000;DEWI;HADI;Jasa IT;Maintenance server bulanan
+TRX-003;2026-11-03;10:12;PT Sinar Abadi;49000000;BUDI;HADI;Pengadaan;Pembelian material
+TRX-004;2026-11-03;14:47;PT Sinar Abadi;49000000;BUDI;HADI;Pengadaan;Pembelian material
+TRX-005;2026-11-04;08:55;PT Logistik Nusantara;12300000;CITRA;RINA;Logistik;Biaya pengiriman batch 101
+TRX-006;2026-11-04;13:20;PT Karya Mandiri;15000000;CITRA;RINA;Pengadaan;Pembelian peralatan kerja
+TRX-007;2026-11-05;11:30;CV Berkah Sentosa;2475000;EKO;HADI;ATK;Pembelian kertas dan tinta
+TRX-008;2026-11-06;09:05;CV Mitra Usaha;24500000;EKO;HADI;Pemeliharaan;Perbaikan AC lantai 3
+TRX-009;2026-11-06;09:41;CV Mitra Usaha;19800000;EKO;HADI;Pemeliharaan;Perbaikan AC lantai 3
+TRX-010;2026-11-06;10:16;CV Mitra Usaha;22300000;EKO;HADI;Pemeliharaan;Perbaikan AC lantai 3
+TRX-011;2026-11-08;21:40;PT Global Supplies;12750000;EKO;EKO;ATK;Pembelian ATK
+TRX-012;2026-11-09;10:02;PT Teknologi Andalan;37850000;CITRA;RINA;Jasa IT;Lisensi software Q4
+TRX-013;2026-11-11;15:40;PT Teknologi Andalan;37850000;CITRA;RINA;Jasa IT;Lisensi software Q4
+TRX-014;2026-11-12;02:15;CV Berkah Sentosa;4150000;ANDI;HADI;ATK;Pembelian ATK
+TRX-015;2026-11-12;11:00;PT Logistik Nusantara;14900000;ANDI;HADI;Logistik;Biaya pengiriman batch 102
+TRX-016;2026-11-13;09:30;PT Wira Konsultindo;150000000;ANDI;RINA;Konsultan;Jasa konsultan restrukturisasi
+TRX-017;2026-11-16;11:45;PT Karya Mandiri;33000000;BUDI;BUDI;Pengadaan;Pembelian material
+TRX-018;2026-11-17;14:10;CV Berkah Sentosa;3320000;CITRA;RINA;ATK;Pembelian map dan binder
+TRX-019;2026-11-18;10:20;CV Berkah Sentosa;145000000;CITRA;RINA;ATK;Pembelian ATK
+TRX-020;2026-11-19;13:00;PT Data Prima;41300000;DEWI;RINA;Jasa IT;Jasa pengembangan sistem
+TRX-021;2026-11-21;10:05;PT Data Prima;46800000;DEWI;RINA;Jasa IT;Jasa pengembangan sistem
+TRX-022;2026-11-23;11:11;CV Maju Jaya;8760000;EKO;RINA;Pemeliharaan;Pemeliharaan genset
+TRX-023;2026-11-24;08:50;CV Maju Jaya;8760000;EKO;RINA;Pemeliharaan;Pemeliharaan genset
+TRX-024;2026-11-24;15:30;PT Data Prima;28650000;DEWI;HADI;Jasa IT;Maintenance server bulanan
+TRX-025;2026-11-25;10:45;PT Data Prima;35200000;DEWI;HADI;Jasa IT;Pengembangan aplikasi
+TRX-026;2026-11-26;09:20;CV Berkah Sentosa;2980000;BUDI;HADI;ATK;Pembelian kertas dan tinta
+TRX-027;2026-11-26;23:05;PT Teknologi Andalan;47900000;CITRA;RINA;Jasa IT;Perpanjangan lisensi
+TRX-028;2026-11-27;09:00;PT Logistik Nusantara;16200000;BUDI;HADI;Logistik;Biaya pengiriman batch 103
+TRX-029;2026-11-27;15:10;PT Logistik Nusantara;1850000000;ANDI;HADI;Logistik;Biaya pengiriman proyek
+TRX-030;2026-11-30;10:30;PT Logistik Nusantara;11750000;CITRA;RINA;Logistik;Biaya pengiriman batch 104
+TRX-031;2026-11-30;11:15;CV Berkah Sentosa;1850000;EKO;HADI;ATK;Pembelian alat tulis`;
+function templateWb(){
+  needX();const rows=parseCSV(TPL_CSV);
+  const aoa=[rows[0]].concat(rows.slice(1).map(r=>[r[0],d2ser(r[1]),t2ser(r[2]),r[3],+r[4],r[5],r[6],r[7],r[8]]));
+  const ws=XLSX.utils.aoa_to_sheet(aoa);fmtCells(ws,1,'yyyy-mm-dd',1);fmtCells(ws,2,'hh:mm',1);fmtCells(ws,4,'#,##0',1);
+  ws['!cols']=[{wch:10},{wch:12},{wch:7},{wch:24},{wch:16},{wch:10},{wch:11},{wch:14},{wch:32}];ws['!autofilter']={ref:ws['!ref']};
+  const help=[['PETUNJUK PENGISIAN TEMPLATE TRANSAKSI'],['Isi data di sheet "Transaksi". Jangan ubah judul kolom di baris pertama. Hapus baris contoh sebelum mengisi data Anda.'],[],
+    ['Kolom','Wajib?','Isi','Contoh'],
+    ['id','Tidak','Nomor/ID transaksi. Jika kosong, aplikasi membuat ID otomatis.','TRX-001'],
+    ['tanggal','Ya','Tanggal transaksi. Boleh format tanggal Excel biasa.','2026-11-03'],
+    ['jam','Tidak','Jam input transaksi (untuk deteksi di luar jam kerja). Jika kosong dianggap 09:00.','10:12'],
+    ['vendor','Ya','Nama vendor / penerima pembayaran.','PT Sinar Abadi'],
+    ['jumlah','Ya','Nominal dalam Rupiah, tanpa "Rp".','49000000'],
+    ['pembuat','Tidak','User yang membuat transaksi (maker).','BUDI'],
+    ['penyetuju','Tidak','User yang menyetujui (checker). Sama dengan pembuat = pelanggaran SoD.','HADI'],
+    ['kategori','Tidak','Kategori/akun biaya. Dipakai untuk deteksi nominal tidak wajar.','Pengadaan'],
+    ['keterangan','Tidak','Uraian transaksi.','Pembelian material'],[],
+    ['Baris contoh','Pola yang diperagakan'],
+    ['TRX-003, TRX-004','Duplicate payment + split transaction + mendekati batas otorisasi'],['TRX-008 s.d. TRX-010','Split transaction'],
+    ['TRX-012/013, TRX-022/023','Duplicate payment'],['TRX-011','Weekend + di luar jam kerja + pembuat = penyetuju'],['TRX-017','Pembuat = penyetuju'],
+    ['TRX-014, TRX-027','Di luar jam kerja'],['TRX-021','Weekend + mendekati batas otorisasi'],['TRX-006, TRX-016','Round amount'],
+    ['TRX-019, TRX-029','Outlier nominal'],['TRX-002, 020, 021, 024, 025','Vendor favorit'],[],['Seluruh data contoh adalah fiktif.']];
+  const wh=XLSX.utils.aoa_to_sheet(help);wh['!cols']=[{wch:26},{wch:10},{wch:70},{wch:18}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Transaksi');XLSX.utils.book_append_sheet(wb,wh,'Petunjuk');return wb;
+}
+function reportWb(){
+  needX();const R=S.res.rows,fl=R.filter(r=>r.score>0).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
+  const sum=a=>a.reduce((s,r)=>s+r.amount,0);const cnt={T:0,S:0,R:0};fl.forEach(r=>cnt[r.level]++);
+  const ds=R.map(r=>r.date).sort();
+  const A=[['LAPORAN TEMUAN PATTERN RECOGNITION'],['Internal Audit · InJourney Aviation Services'],[],
+    ['Sumber data',S.src],['Periode transaksi',ds.length?ds[0]+' s.d. '+ds[ds.length-1]:'-'],['Tanggal laporan',today()],[],
+    ['RINGKASAN','Nilai'],['Transaksi dianalisis',R.length],['Nilai transaksi (Rp)',sum(R)],['Transaksi berpola',fl.length],['Persentase berpola',R.length?fl.length/R.length:0],
+    ['Risiko tinggi (skor ≥ 50)',cnt.T],['Risiko sedang (skor 25–49)',cnt.S],['Risiko rendah (skor 1–24)',cnt.R],['Nilai terpapar tinggi + sedang (Rp)',sum(fl.filter(r=>r.level!=='R'))],[],
+    ['TEMUAN PER JENIS POLA','Kelompok','Jumlah transaksi','Nilai (Rp)']];
+  const pctRow=11;
+  RULES.filter(r=>cfg.on[r.id]).forEach(r=>{const a=fl.filter(x=>x.flags.some(f=>f.r===r.id));A.push([r.name,GROUPS[r.g].label,a.length,sum(a)])});
+  A.push([],['STATUS TINDAK LANJUT','Jumlah']);STS.forEach(s=>A.push([s,fl.filter(r=>(S.status[r.id]||'Baru')===s).length]));
+  A.push([],['VENDOR BERISIKO','Trx berpola','Risiko tinggi','Nilai (Rp)','Akumulasi skor']);
+  [...groupBy(fl,r=>r.vendor).entries()].map(([v,a])=>[v,a.length,a.filter(r=>r.level==='T').length,sum(a),a.reduce((x,r)=>x+r.score,0)]).sort((a,b)=>b[4]-a[4]).forEach(x=>A.push(x));
+  A.push([],['Catatan: pola abnormal adalah indikasi untuk investigasi, bukan bukti fraud. Tetap perlu validasi, korroborasi, dan professional judgment.']);
+  const ws1=XLSX.utils.aoa_to_sheet(A);ws1['!cols']=[{wch:38},{wch:22},{wch:16},{wch:18},{wch:16}];
+  [1,3].forEach(c=>fmtCells(ws1,c,'#,##0',8));const pc=ws1[XLSX.utils.encode_cell({r:pctRow,c:1})];if(pc)pc.z='0.0%';
+  const T=[['No','Skor','Tingkat risiko','ID transaksi','Tanggal','Jam','Vendor','Kategori','Jumlah (Rp)','Pembuat','Penyetuju','Pola terdeteksi','Alasan / catatan sistem','Status tindak lanjut','Keterangan transaksi']]
+    .concat(fl.map((r,i)=>[i+1,r.score,LV[r.level],r.id,d2ser(r.date),r.time,r.vendor,r.cat,r.amount,r.maker,r.approver,r.flags.map(f=>RULE[f.r].name).join('; '),r.flags.map(f=>RULE[f.r].name+': '+f.note).join(' | '),S.status[r.id]||'Baru',r.desc]));
+  const ws2=XLSX.utils.aoa_to_sheet(T);fmtCells(ws2,4,'yyyy-mm-dd',1);fmtCells(ws2,8,'#,##0',1);
+  ws2['!cols']=[{wch:5},{wch:6},{wch:13},{wch:12},{wch:11},{wch:6},{wch:24},{wch:13},{wch:16},{wch:10},{wch:10},{wch:40},{wch:70},{wch:22},{wch:30}];ws2['!autofilter']={ref:ws2['!ref']};
+  const b=benford();const B=[['UJI BENFORD\'S LAW (DIGIT PERTAMA)'],['Nominal diuji',b.n],['Mean absolute deviation',b.mad],[],['Digit','Jumlah','Aktual','Harapan Benford','Selisih','z-stat','Signifikan (|z| > 1,96)']]
+    .concat(b.d.map(x=>[x.k,x.cnt,x.o,x.e,x.o-x.e,x.z,x.z>1.96?'Ya':'Tidak']));
+  const ws3=XLSX.utils.aoa_to_sheet(B);[2,3,4].forEach(c=>fmtCells(ws3,c,'0.0%',5));fmtCells(ws3,5,'0.00',5);const mc=ws3['B3'];if(mc)mc.z='0.0000';ws3['!cols']=[{wch:30},{wch:10},{wch:10},{wch:16},{wch:10},{wch:10},{wch:22}];
+  const C=[['PARAMETER MESIN DETEKSI'],[],['Parameter','Nilai']].concat(PARAMS.map(([k,l])=>[l,cfg[k]]),[[],['Aturan','Kelompok','Aktif','Bobot']],RULES.map(r=>[r.name,GROUPS[r.g].label,cfg.on[r.id]?'Ya':'Tidak',cfg.w[r.id]]));
+  const ws4=XLSX.utils.aoa_to_sheet(C);fmtCells(ws4,1,'#,##0.##',3);ws4['!cols']=[{wch:36},{wch:22},{wch:8},{wch:8}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws1,'Ringkasan');XLSX.utils.book_append_sheet(wb,ws2,'Daftar Temuan');XLSX.utils.book_append_sheet(wb,ws3,'Benford');XLSX.utils.book_append_sheet(wb,ws4,'Parameter');
+  return wb;
+}
+function exportReport(){try{const wb=reportWb();const fn=`Laporan-Temuan-Pattern-Recognition-${today()}.xlsx`;XLSX.writeFile(wb,fn);toast('Laporan diunduh: '+fn)}catch(e){toast(e.message,true)}}
+function dlTemplate(){try{XLSX.writeFile(templateWb(),'template-transaksi.xlsx');toast('Template diunduh: template-transaksi.xlsx')}catch(e){toast(e.message,true)}}
+
 function copyText(txt,target){const done=ok=>{const el=$(target);if(el)el.innerHTML=ok?'<span class="msg ok">Tersalin ke clipboard.</span>':`<p class="small muted">Clipboard tidak tersedia. Salin manual:</p><textarea readonly>${esc(txt)}</textarea>`;if(!ok){const ta=el&&el.querySelector('textarea');if(ta){ta.focus();ta.select()}}};
   try{navigator.clipboard.writeText(txt).then(()=>done(true),()=>done(false))}catch(e){done(false)}}
 
 function bind(v){
+  const ex=$('#expXlsx');if(ex)ex.onclick=exportReport;
   if(v==='temuan'){
     const upd=()=>{S.f={lv:$('#fLv').value,rule:$('#fRule').value,st:$('#fSt').value,q:$('#fQ').value};const pos=$('#fQ').selectionStart;render();if(document.activeElement!==$('#fQ')&&S._q){$('#fQ').focus();$('#fQ').setSelectionRange(pos,pos)}};
     ['#fLv','#fRule','#fSt'].forEach(s=>$(s).onchange=upd);$('#fQ').oninput=()=>{S._q=true;upd();S._q=false};
@@ -600,7 +720,11 @@ function bind(v){
   }
   if(v==='data'){
     $('#loadSample').onclick=()=>{load(sample(),'Data contoh (fiktif)');S.msg={t:'ok',s:'Data contoh dimuat ulang.'};render()};
-    $('#fileIn').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{importCSV(rd.result,f.name)}catch(err){S.msg={t:'err',s:err.message};render()}};rd.readAsText(f)};
+    $('#fileIn').onchange=e=>{const f=e.target.files[0];if(!f)return;const xl=/\.xlsx?$/i.test(f.name);const rd=new FileReader();
+      rd.onload=()=>{try{xl?importRows(xlsxRows(new Uint8Array(rd.result)),f.name):importCSV(rd.result,f.name)}catch(err){S.msg={t:'err',s:err.message};render()}};
+      rd.onerror=()=>{S.msg={t:'err',s:'File tidak bisa dibaca. Tutup file di Excel lalu coba unggah lagi.'};render()};
+      xl?rd.readAsArrayBuffer(f):rd.readAsText(f)};
+    $('#dlTplX').onclick=dlTemplate;
     $('#parsePaste').onclick=()=>{try{importCSV($('#pasteIn').value,'Data tempel')}catch(err){S.msg={t:'err',s:err.message};render()}};
     $('#copyTpl').onclick=()=>copyText(TEMPLATE,'#tplMsg');
   }
