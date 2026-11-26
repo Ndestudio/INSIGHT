@@ -6,6 +6,10 @@ Aplikasi web satu halaman untuk Internal Audit InJourney Aviation Services. Apli
 
 - **Ringkasan**: angka utama, sebaran tingkat risiko, timeline harian, ilustrasi kasus teratas, dan vendor dengan skor tertinggi.
 - **Temuan**: daftar transaksi berpola dengan filter, alasan per aturan, status tindak lanjut, dan salin CSV.
+- **Laporan pimpinan (PDF)**: dari menu Ringkasan atau Temuan, buka pratinjau laporan eksekutif A4 bergaya dashboard dengan identitas IAS, lalu klik **Unduh PDF** atau **Cetak**. Isinya:
+  - *Halaman 1 – Ikhtisar*: sampul dengan periode dan sumber data, 5 indikator utama, pesan utama untuk pimpinan (disusun otomatis dari hasil analisis), sebaran tingkat risiko, temuan per jenis pola, vendor berisiko, status tindak lanjut, dan timeline harian.
+  - *Halaman 2 – Prioritas & rekomendasi*: 10 temuan berisiko tertinggi, temuan per kelompok pola, uji Benford's Law, metodologi singkat, rekomendasi tindak lanjut sesuai pola yang ditemukan, catatan, dan kolom tanda tangan.
+  - *Lampiran*: daftar temuan lainnya (34 baris per halaman).
 - **Export laporan (Excel)**: dari menu Ringkasan atau Temuan, unduh rekap temuan dalam satu file `.xlsx` berisi 4 sheet: *Ringkasan* (indikator utama, temuan per pola, status tindak lanjut, vendor berisiko), *Daftar Temuan* (seluruh transaksi berpola beserta skor, pola, alasan, dan status), *Benford*, dan *Parameter* mesin deteksi yang dipakai.
 - **Benford's Law**: uji digit pertama dengan MAD (ambang Nigrini) dan z-stat per digit.
 - **Relasi & Perilaku**: matriks pembuat × vendor, profil penyetuju (SoD), vendor favorit, aktivitas di luar jam kerja.
@@ -20,7 +24,7 @@ Aplikasi web satu halaman untuk Internal Audit InJourney Aviation Services. Apli
 
 ## Cara membuka
 
-- **Di komputer:** klik dua kali `index.html`, atau seret ke jendela browser (Chrome, Edge, Firefox). Tidak perlu instalasi atau server. Koneksi internet dipakai untuk memuat font Montserrat dan pembaca Excel (SheetJS). Tanpa internet, aplikasi tetap jalan dengan file CSV.
+- **Di komputer:** klik dua kali `index.html`, atau seret ke jendela browser (Chrome, Edge, Firefox). Tidak perlu instalasi atau server. Koneksi internet dipakai untuk memuat font Montserrat, pembaca Excel (SheetJS), dan pembuat PDF (html2canvas + jsPDF). Tanpa internet, aplikasi tetap jalan dengan file CSV. Saat dibuka sebagai file lokal, tombol **Unduh PDF** bisa diblokir browser; gunakan **Cetak → Save as PDF**, atau buka lewat situs web.
 - **Lewat web:** aktifkan GitHub Pages (Settings → Pages → Deploy from a branch → `main` / root). Aplikasi lalu bisa dibuka di `https://ndestudio.github.io/INSIGHT/`.
 
 ## Format data (Excel atau CSV)

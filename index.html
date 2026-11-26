@@ -262,6 +262,103 @@ pre.code{background:rgba(6,10,34,.6)}
 .toast.err{border-color:var(--high);box-shadow:0 0 24px rgba(255,107,94,.3);color:var(--high)}
 .btn.xl{border-color:rgba(79,211,154,.55)}
 .btn.xl::before{content:"";width:14px;height:14px;border-radius:3px;background:linear-gradient(135deg,#1D9E5C,#4FD39A);box-shadow:inset 0 0 0 3px rgba(255,255,255,.25)}
+.btn.pdf{border-color:rgba(255,107,94,.55)}
+.btn.pdf::before{content:"";width:14px;height:14px;border-radius:3px;background:linear-gradient(135deg,#C8372D,#FF6B5E);box-shadow:inset 0 0 0 3px rgba(255,255,255,.25)}
+.btn:disabled{opacity:.6;cursor:progress}
+
+/* ===== Laporan pimpinan (A4, light, print-safe) ===== */
+#rpModal{position:fixed;inset:0;z-index:60;background:rgba(3,6,22,.9);overflow:auto;-webkit-overflow-scrolling:touch}
+.rp-bar{position:sticky;top:0;z-index:2;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding-block:calc(12px + env(safe-area-inset-top,0px)) 12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:rgba(6,10,34,.96);border-bottom:1px solid rgba(4,176,192,.45)}
+.rp-bar h3{font-size:1rem;color:#fff;margin:0}
+.rp-pages{width:794px;margin:0 auto;padding:24px 0 48px;display:flex;flex-direction:column;gap:24px}
+.pg{width:794px;height:1123px;background:#FFFFFF;color:#1D2250;font-family:"Montserrat",Arial,sans-serif;font-size:10.5px;line-height:1.45;position:relative;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.pg *{box-sizing:border-box}
+.pg h1,.pg h2,.pg h3,.pg h4{font-family:"Montserrat",Arial,sans-serif;color:inherit;margin:0;text-wrap:balance}
+.pg .in{padding:0 40px}
+.pg .cv{height:214px;color:#FFFFFF;padding:24px 40px 0;position:relative;overflow:hidden;background:#141850}
+.pg .cv>.gl{position:absolute;top:-150px;left:300px;width:900px;height:506px;background:url("hero-globe.jpg") center/cover no-repeat}
+.pg .cv>.ov{position:absolute;left:0;top:0;width:794px;height:214px;background:linear-gradient(90deg,#141850 0%,#141850 40%,rgba(20,24,80,.55) 70%,rgba(20,24,80,.1) 100%)}
+.pg .cv>.bt{position:absolute;left:0;bottom:0;width:794px;height:5px;background:#04B0C0}
+.pg .cv>.cvc{position:relative}
+.pg .cv-top{display:flex;justify-content:space-between;align-items:center}
+.pg .cv-top img{height:34px;width:auto}
+.pg .tag{font-size:8.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#04B0C0;border:1px solid #04B0C0;border-radius:999px;padding:4px 10px}
+.pg .cv h1{font-size:25px;font-weight:800;line-height:1.15;margin-top:22px;letter-spacing:-.01em}
+.pg .cv h1 span{display:block;color:#04B0C0;font-style:italic;font-weight:700;font-size:15px;margin-top:4px;letter-spacing:0}
+.pg .meta{display:flex;gap:26px;margin-top:16px;font-size:9px}
+.pg .meta b{display:block;font-size:7.5px;letter-spacing:.12em;text-transform:uppercase;color:#8FE3EB;font-weight:700;margin-bottom:1px}
+.pg .strip{height:62px;background:#141850;color:#FFFFFF;display:flex;align-items:center;justify-content:space-between;padding:0 40px;position:relative}
+.pg .strip::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:#04B0C0}
+.pg .strip img{height:26px;width:auto}
+.pg .strip div{font-size:9px;text-align:right}
+.pg .strip div b{display:block;font-size:11px;font-weight:800}
+.pg .sec{margin-top:18px}
+.pg .st{font-size:11.5px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.pg .st::before{content:"";width:4px;height:14px;background:#04B0C0;border-radius:2px}
+.pg .st small{font-weight:500;color:#6B6F8C;font-size:8.5px;margin-left:auto}
+.pg .kpi5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.pg .k{border:1px solid #D1D3D4;border-top:3px solid #04B0C0;border-radius:6px;padding:9px 10px 8px}
+.pg .k.hi{border-top-color:#D64535}
+.pg .k .l{font-size:7.5px;letter-spacing:.08em;text-transform:uppercase;color:#6B6F8C;font-weight:700}
+.pg .k .v{font-size:18px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pg .k.hi .v{color:#D64535}
+.pg .k .s{font-size:8px;color:#6B6F8C}
+.pg .msgs{background:#EFF9FA;border-left:4px solid #04B0C0;border-radius:0 6px 6px 0;padding:10px 14px 10px 30px;margin:0}
+.pg .msgs li{margin:2px 0}
+.pg .msgs b{color:#1D2250}
+.pg .two{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.pg .seg{display:flex;height:14px;border-radius:3px;overflow:hidden;background:#E9EBEF}
+.pg .lg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.pg .lg div{font-size:8px;color:#6B6F8C}
+.pg .lg b{display:block;font-size:12px;color:#1D2250;font-weight:800}
+.pg .lg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;vertical-align:0}
+.pg .bars{display:grid;grid-template-columns:128px 1fr 26px;gap:5px 8px;align-items:center;font-size:9px}
+.pg .bars .t{height:9px;background:#EEF0F3;border-radius:2px;overflow:hidden}
+.pg .bars .f{height:100%;border-radius:2px}
+.pg .bars .n{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.pg table{width:100%;border-collapse:collapse;font-size:8.8px;table-layout:fixed}
+.pg th{background:#1D2250;color:#FFFFFF;font-size:7.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;text-align:left;padding:6px 6px}
+.pg td{padding:5px 6px;border-bottom:1px solid #E4E6EB;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+.pg tbody tr:nth-child(even) td{background:#F6F7F9}
+.pg .r{text-align:right;font-variant-numeric:tabular-nums}
+.pg .c{text-align:center}
+.pg .pl{display:inline-block;padding:1px 7px;border-radius:999px;font-weight:700;font-size:8px}
+.pg .pl.T{background:#FBE3E1;color:#C2372A}.pg .pl.S{background:#FCEFD9;color:#B5700E}.pg .pl.R{background:#E3EFF7;color:#2F6E96}
+.pg .tl{display:flex;align-items:flex-end;gap:2px;height:96px;border-bottom:1px solid #D1D3D4}
+.pg .tl>div{flex:1;display:flex;flex-direction:column-reverse;height:100%}
+.pg .tl span{display:block}
+.pg .tlx{display:flex;gap:2px;font-size:7.5px;color:#6B6F8C;margin-top:3px}
+.pg .tlx span{flex:1;text-align:center}
+.pg .grp{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pg .grp div{border:1px solid #D1D3D4;border-radius:6px;padding:9px 10px;border-left:4px solid}
+.pg .grp b{display:block;font-size:16px;font-weight:800}
+.pg .grp small{font-size:8px;color:#6B6F8C}
+.pg .bf{display:flex;align-items:flex-end;gap:6px;height:92px;border-bottom:1px solid #D1D3D4;padding-top:6px}
+.pg .bf>div{flex:1;height:100%;position:relative;display:flex;justify-content:center;align-items:flex-end}
+.pg .bf .o{width:60%;background:#1D2250;border-radius:2px 2px 0 0}
+.pg .bf .o.z{background:#D64535}
+.pg .bf .e{position:absolute;left:6%;right:6%;border-top:2px dashed #04B0C0}
+.pg .bfx{display:flex;gap:6px;font-size:8px;color:#6B6F8C;margin-top:3px}
+.pg .bfx span{flex:1;text-align:center}
+.pg ol.rec{margin:0;padding-left:16px}
+.pg ol.rec li{margin:3px 0}
+.pg ol.rec b{color:#1D2250}
+.pg .note{background:#FFF7E8;border-left:4px solid #E89A2C;padding:8px 12px;border-radius:0 6px 6px 0;font-size:9px;color:#5A4A2A}
+.pg .sign{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:14px;font-size:9px}
+.pg .sign div{border-top:1px solid #1D2250;padding-top:4px;margin-top:46px}
+.pg .ft{position:absolute;left:0;right:0;bottom:0;height:34px;border-top:1px solid #D1D3D4;display:flex;align-items:center;justify-content:space-between;padding:0 40px;font-size:8px;color:#6B6F8C}
+.pg .ft b{color:#1D2250}
+@media print{
+  @page{size:A4;margin:0}
+  html,body{background:#FFFFFF!important}
+  body>*:not(#rpModal){display:none!important}
+  :root{padding:0!important}
+  #rpModal{position:static;background:none;overflow:visible}
+  .rp-bar{display:none!important}
+  .rp-pages{zoom:1!important;width:auto;padding:0;gap:0}
+  .pg{box-shadow:none;break-after:page;page-break-after:always}
+  .pg,.pg *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </head>
 <body>
@@ -437,7 +534,7 @@ function vRingkasan(){
     caseHtml=`<div class="case"><div class="tw"><table><thead><tr><th>ID</th><th>Vendor</th><th class="r">Jumlah</th><th>Tanggal</th><th>Skor</th></tr></thead><tbody>${rel.map(r=>`<tr class="${r.score>0?'hit':''}"><td class="mono">${r.id}</td><td>${esc(r.vendor)}</td><td class="r num">${rp(r.amount)}</td><td>${fdate(r.date)}</td><td>${pill(r)}</td></tr>`).join('')}</tbody></table></div>
     <div class="found"><h4>Pola yang terdeteksi</h4><ul>${rs.map(x=>`<li>${esc(RULE[x].name)}</li>`).join('')}<li>${esc(top.vendor)} · ${rel.filter(r=>r.score>0).length} transaksi berdekatan</li></ul><div class="ind"><mark>Indikasi:</mark> ${ind}. Lanjutkan ke investigasi dan konfirmasi dokumen pendukung.</div></div></div>`}
   const segs=[['T','var(--high)'],['S','var(--med)'],['R','var(--low)']].map(([k,c])=>`<span style="width:${100*cnt[k]/R.length}%;background:${c}" title="${LV[k]}: ${cnt[k]}"></span>`).join('');
-  return `<section class="view"><div class="vh"><div><h2>Ringkasan Audit Intelligence</h2><p>Population-based auditing: seluruh transaksi diuji terhadap ${RULES.filter(r=>cfg.on[r.id]).length} aturan pola, lalu diberi skor risiko 0–100.</p></div><div class="row"><button class="btn xl" id="expXlsx">Export laporan (Excel)</button><a class="btn pri" href="#temuan">Tinjau temuan →</a></div></div>
+  return `<section class="view"><div class="vh"><div><h2>Ringkasan Audit Intelligence</h2><p>Population-based auditing: seluruh transaksi diuji terhadap ${RULES.filter(r=>cfg.on[r.id]).length} aturan pola, lalu diberi skor risiko 0–100.</p></div><div class="row"><button class="btn pdf" id="expPdf">Laporan pimpinan (PDF)</button><button class="btn xl" id="expXlsx">Export laporan (Excel)</button><a class="btn pri" href="#temuan">Tinjau temuan →</a></div></div>
   <div class="kpis">
     <div class="kpi"><div class="k">Transaksi dianalisis</div><div class="v">${R.length.toLocaleString('id-ID')}</div><div class="d">100% populasi, bukan sampel</div></div>
     <div class="kpi"><div class="k">Nilai transaksi</div><div class="v">${rps(tot)}</div><div class="d">${groupBy(R,r=>r.vendor).size} vendor · ${groupBy(R,r=>r.maker).size} pembuat</div></div>
@@ -465,7 +562,7 @@ const STS=['Baru','Investigasi','Temuan valid','Bukan fraud (dijelaskan)'];
 function vTemuan(){
   const rows=filtered(),f=S.f,all=S.res.rows.filter(r=>r.score>0);
   const stc=Object.fromEntries(STS.map(s=>[s,all.filter(r=>(S.status[r.id]||'Baru')===s).length]));
-  return `<section class="view"><div class="vh"><div><h2>Temuan pola</h2><p>Daftar transaksi berpola, diurutkan dari skor tertinggi. Klik baris untuk melihat alasan setiap aturan. Status tindak lanjut tersimpan di browser Anda.</p></div><div class="row"><button class="btn pri" id="expXlsx">Export laporan (Excel)</button><button class="btn" id="copyCsv">Salin CSV temuan</button></div></div>
+  return `<section class="view"><div class="vh"><div><h2>Temuan pola</h2><p>Daftar transaksi berpola, diurutkan dari skor tertinggi. Klik baris untuk melihat alasan setiap aturan. Status tindak lanjut tersimpan di browser Anda.</p></div><div class="row"><button class="btn pdf" id="expPdf">Laporan pimpinan (PDF)</button><button class="btn xl" id="expXlsx">Export laporan (Excel)</button><button class="btn" id="copyCsv">Salin CSV temuan</button></div></div>
   <div class="kpis">${STS.map(s=>`<div class="kpi"><div class="k">${s}</div><div class="v">${stc[s]}</div></div>`).join('')}</div>
   <div class="panel"><div class="row" style="margin-bottom:12px">
     <label class="field">Tingkat risiko<select id="fLv"><option value="">Semua</option>${Object.entries(LV).map(([k,v])=>`<option value="${k}"${f.lv===k?' selected':''}>${v}</option>`).join('')}</select></label>
@@ -705,11 +802,143 @@ function reportWb(){
 function exportReport(){try{const wb=reportWb();const fn=`Laporan-Temuan-Pattern-Recognition-${today()}.xlsx`;XLSX.writeFile(wb,fn);toast('Laporan diunduh: '+fn)}catch(e){toast(e.message,true)}}
 function dlTemplate(){try{XLSX.writeFile(templateWb(),'template-transaksi.xlsx');toast('Template diunduh: template-transaksi.xlsx')}catch(e){toast(e.message,true)}}
 
+/* ---------- Laporan pimpinan (PDF) ---------- */
+const BLN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const fLong=d=>{const [y,m,dd]=d.split('-');return `${+dd} ${BLN[+m-1]} ${y}`};
+const fShort=d=>{const [y,m,dd]=d.split('-');return `${+dd} ${BLN[+m-1].slice(0,3)} ${y}`};
+const LVC={T:'#D64535',S:'#E89A2C',R:'#5B9BC4'};
+const GRC={Transaction:'#1D2250',Behavioral:'#04B0C0',Anomaly:'#E08A1E'};
+const REC={DUP:'Konfirmasi pembayaran ganda ke vendor dan bagian keuangan; tagih pengembalian bila terbukti.',
+  SPLIT:'Periksa dokumen pengadaan atas transaksi yang dipecah dan evaluasi kemungkinan penghindaran batas otorisasi.',
+  NEAR:'Uji kewajaran transaksi yang nilainya tepat di bawah batas otorisasi.',
+  ROUND:'Minta dokumen pendukung (penawaran, kontrak, BAST) untuk transaksi bernominal bulat bernilai besar.',
+  WKND:'Minta justifikasi tertulis atas transaksi yang dicatat pada akhir pekan.',
+  HRS:'Tinjau log akses sistem untuk transaksi yang diinput di luar jam kerja.',
+  SOD:'Perkuat segregation of duties: sistem harus menolak pembuat menyetujui transaksinya sendiri.',
+  FAV:'Evaluasi potensi conflict of interest dan pertimbangkan rotasi penanganan vendor.',
+  OUT:'Verifikasi kewajaran nilai dan kelengkapan dokumen atas transaksi bernilai jauh di atas kategorinya.'};
+function reportData(){
+  const R=S.res.rows,fl=R.filter(r=>r.score>0).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
+  const sum=a=>a.reduce((s,r)=>s+r.amount,0);const cnt={T:0,S:0,R:0};fl.forEach(r=>cnt[r.level]++);
+  const byRule=RULES.filter(r=>cfg.on[r.id]).map(r=>{const a=fl.filter(x=>x.flags.some(f=>f.r===r.id));return {r,n:a.length,v:sum(a)}}).sort((a,b)=>b.n-a.n);
+  const vend=[...groupBy(fl,r=>r.vendor).entries()].map(([v,a])=>({v,n:a.length,hi:a.filter(r=>r.level==='T').length,amt:sum(a),s:a.reduce((x,r)=>x+r.score,0)})).sort((a,b)=>b.s-a.s);
+  const st=STS.map(s=>({s,n:fl.filter(r=>(S.status[r.id]||'Baru')===s).length}));
+  return {R,fl,sum,cnt,ds:R.map(r=>r.date).sort(),byRule,vend,st,b:benford()};
+}
+function reportPages(){
+  const D=reportData(),{R,fl,sum,cnt,ds,byRule,vend,st,b}=D;
+  const per=ds.length?`${fShort(ds[0])} – ${fShort(ds[ds.length-1])}`:'-';
+  const now=new Date(),tgl=`${now.getDate()} ${BLN[now.getMonth()]} ${now.getFullYear()}`;
+  const hiAmt=sum(fl.filter(r=>r.level==='T')),exp=sum(fl.filter(r=>r.level!=='R'));
+  const conf=b.mad<.006?'close conformity':b.mad<.012?'acceptable conformity':b.mad<.015?'marginally acceptable':'nonconformity';
+  const followed=fl.filter(r=>(S.status[r.id]||'Baru')!=='Baru').length;
+  const msgs=[`<b>${fl.length} dari ${R.length.toLocaleString('id-ID')} transaksi (${pct(fl.length,R.length)})</b> menunjukkan setidaknya satu pola tidak wajar, dengan nilai ${rps(sum(fl))}.`,
+    `<b>${cnt.T} transaksi berisiko tinggi</b> senilai ${rps(hiAmt)} perlu diprioritaskan untuk investigasi.`];
+  if(byRule[0]&&byRule[0].n)msgs.push(`Pola paling sering muncul: <b>${esc(byRule[0].r.name)}</b> (${byRule[0].n} transaksi)${byRule[1]&&byRule[1].n?`, diikuti ${esc(byRule[1].r.name)} (${byRule[1].n})`:''}.`);
+  if(vend[0])msgs.push(`Vendor dengan akumulasi risiko tertinggi: <b>${esc(vend[0].v)}</b> (${vend[0].n} transaksi berpola, ${rps(vend[0].amt)}).`);
+  msgs.push(`Uji Benford's Law atas ${b.n} nominal: <b>${conf}</b> (MAD ${b.mad.toFixed(4).replace('.',',')}).`);
+  msgs.push(`Tindak lanjut: <b>${followed} dari ${fl.length}</b> temuan sudah diproses (status selain "Baru").`);
+  // timeline
+  let tl='',tlx='';
+  if(ds.length){const d0=Date.parse(ds[0]),n=Math.min(62,Math.round((Date.parse(ds[ds.length-1])-d0)/864e5)+1),all=[];
+    for(let i=0;i<n;i++){const d=new Date(d0+i*864e5).toISOString().slice(0,10);const a=R.filter(r=>r.date===d);all.push({d,nf:a.filter(r=>!r.score).length,f:a.filter(r=>r.score>0).length})}
+    const mx=Math.max(1,...all.map(a=>a.nf+a.f));
+    tl=all.map(a=>`<div><span style="height:${100*a.nf/mx}%;background:${dow(a.d)%6?'#9FB4D9':'#D1D3D4'}"></span><span style="height:${100*a.f/mx}%;background:#D64535"></span></div>`).join('');
+    tlx=all.map((a,i)=>`<span>${i%5===0?+a.d.slice(8):''}</span>`).join('')}
+  const mxR=Math.max(1,...byRule.map(x=>x.n));
+  const rows=(a,i0)=>a.map((r,i)=>`<tr><td class="c">${i0+i+1}</td><td>${esc(r.id)}</td><td>${fShort(r.date)}</td><td>${esc(r.vendor)}</td><td class="r">${rp(r.amount)}</td><td>${esc(r.maker)} → ${esc(r.approver)}</td><td class="c"><span class="pl ${r.level}">${r.score}</span></td><td>${esc(r.flags.map(f=>RULE[f.r].name).join(', '))}</td><td>${esc(S.status[r.id]||'Baru')}</td></tr>`).join('');
+  const colg='<colgroup><col style="width:24px"><col style="width:56px"><col style="width:58px"><col style="width:108px"><col style="width:84px"><col style="width:102px"><col style="width:34px"><col><col style="width:70px"></colgroup>';
+  const head='<thead><tr><th class="c">No</th><th>ID</th><th>Tanggal</th><th>Vendor</th><th class="r">Jumlah</th><th>Pembuat → Penyetuju</th><th class="c">Skor</th><th>Pola terdeteksi</th><th>Status</th></tr></thead>';
+  const APP=34,chunks=[];for(let i=10;i<fl.length;i+=APP)chunks.push([i,fl.slice(i,i+APP)]);
+  const N=2+chunks.length;
+  const ft=i=>`<div class="ft"><span><b>Internal Audit · InJourney Aviation Services</b> · Rahasia, untuk kalangan terbatas</span><span>Dibuat ${tgl} · Halaman ${i} dari ${N}</span></div>`;
+  const strip=t=>`<div class="strip"><img src="ias-logo-white.png" alt="InJourney Aviation Services"><div><b>${t}</b>Laporan Pattern Recognition · Periode ${per}</div></div>`;
+  const recs=byRule.filter(x=>x.n&&REC[x.r.id]).map(x=>`<li><b>${esc(x.r.name)} (${x.n} trx):</b> ${REC[x.r.id]}</li>`).join('');
+  const grpCards=Object.entries(GROUPS).map(([g,G])=>{const a=fl.filter(r=>r.flags.some(f=>RULE[f.r].g===g));return `<div style="border-left-color:${GRC[g]}"><small>${G.label}</small><b>${a.length} <span style="font-size:9px;font-weight:600;color:#6B6F8C">transaksi</span></b><small>${rps(sum(a))}</small></div>`}).join('');
+  const bmx=Math.max(...b.d.map(x=>Math.max(x.e,x.o)))*1.15||1;
+  const page1=`<div class="pg">
+   <div class="cv"><div class="gl"></div><div class="ov"></div><div class="bt"></div><div class="cvc"><div class="cv-top"><img src="ias-logo-white.png" alt="InJourney Aviation Services"><span class="tag">Laporan eksekutif · Rahasia</span></div>
+    <h1>Laporan Hasil Pattern Recognition<span>Analisis pola transaksi untuk deteksi dini risiko dan fraud</span></h1>
+    <div class="meta"><div><b>Periode transaksi</b>${per}</div><div><b>Sumber data</b>${esc(S.src)}</div><div><b>Populasi diuji</b>${R.length.toLocaleString('id-ID')} transaksi (100%)</div><div><b>Tanggal laporan</b>${tgl}</div></div></div></div>
+   <div class="in">
+    <div class="sec"><div class="st">Ikhtisar hasil analisis</div><div class="kpi5">
+     <div class="k"><div class="l">Transaksi dianalisis</div><div class="v">${R.length.toLocaleString('id-ID')}</div><div class="s">${groupBy(R,r=>r.vendor).size} vendor · ${groupBy(R,r=>r.maker).size} pembuat</div></div>
+     <div class="k"><div class="l">Nilai transaksi</div><div class="v">${rps(sum(R))}</div><div class="s">total populasi</div></div>
+     <div class="k"><div class="l">Transaksi berpola</div><div class="v">${fl.length}</div><div class="s">${pct(fl.length,R.length)} dari populasi</div></div>
+     <div class="k hi"><div class="l">Risiko tinggi</div><div class="v">${cnt.T}</div><div class="s">skor ≥ 50 · ${rps(hiAmt)}</div></div>
+     <div class="k"><div class="l">Nilai terpapar</div><div class="v">${rps(exp)}</div><div class="s">risiko tinggi + sedang</div></div></div></div>
+    <div class="sec"><div class="st">Pesan utama untuk pimpinan</div><ul class="msgs">${msgs.map(m=>`<li>${m}</li>`).join('')}</ul></div>
+    <div class="sec two">
+     <div><div class="st">Sebaran tingkat risiko</div>
+      <div class="seg">${['T','S','R'].map(k=>`<span style="width:${R.length?100*cnt[k]/R.length:0}%;background:${LVC[k]}"></span>`).join('')}</div>
+      <div class="lg">${['T','S','R'].map(k=>`<div><i style="background:${LVC[k]}"></i>${LV[k]}<b>${cnt[k]}</b>${rps(sum(fl.filter(r=>r.level===k)))}</div>`).join('')}<div><i style="background:#E9EBEF"></i>Normal<b>${R.length-fl.length}</b>tanpa pola</div></div>
+      <div class="st" style="margin-top:16px">Temuan per jenis pola</div>
+      <div class="bars">${byRule.map(x=>`<div>${esc(x.r.name)}</div><div class="t"><div class="f" style="width:${100*x.n/mxR}%;background:${GRC[x.r.g]}"></div></div><div class="n">${x.n}</div>`).join('')}</div>
+      <div class="lg" style="grid-template-columns:repeat(3,auto);justify-content:start;gap:14px">${Object.entries(GROUPS).map(([g,G])=>`<div><i style="background:${GRC[g]}"></i>${G.label}</div>`).join('')}</div></div>
+     <div><div class="st">Vendor dengan risiko tertinggi</div>
+      <table><colgroup><col><col style="width:40px"><col style="width:44px"><col style="width:78px"></colgroup><thead><tr><th>Vendor</th><th class="r">Trx</th><th class="r">Tinggi</th><th class="r">Nilai</th></tr></thead><tbody>
+      ${vend.slice(0,6).map(v=>`<tr><td>${esc(v.v)}</td><td class="r">${v.n}</td><td class="r">${v.hi}</td><td class="r">${rps(v.amt)}</td></tr>`).join('')||'<tr><td colspan="4">Tidak ada temuan.</td></tr>'}</tbody></table>
+      <div class="st" style="margin-top:16px">Status tindak lanjut <small>${pct(followed,fl.length)} diproses</small></div>
+      <div class="bars" style="grid-template-columns:128px 1fr 26px">${st.map(x=>`<div>${x.s}</div><div class="t"><div class="f" style="width:${fl.length?100*x.n/fl.length:0}%;background:${x.s==='Baru'?'#9FB4D9':x.s==='Investigasi'?'#E89A2C':x.s==='Temuan valid'?'#D64535':'#3AA676'}"></div></div><div class="n">${x.n}</div>`).join('')}</div></div>
+    </div>
+    <div class="sec"><div class="st">Timeline transaksi harian <small>merah = berpola · abu-abu = akhir pekan</small></div><div class="tl">${tl}</div><div class="tlx">${tlx}</div></div>
+   </div>${ft(1)}</div>`;
+  const page2=`<div class="pg">${strip('Prioritas dan rekomendasi')}
+   <div class="in">
+    <div class="sec"><div class="st">10 temuan dengan risiko tertinggi</div>
+     <table>${colg}${head}<tbody>${rows(fl.slice(0,10),0)||'<tr><td colspan="9">Tidak ada temuan.</td></tr>'}</tbody></table></div>
+    <div class="sec"><div class="st">Temuan per kelompok pola</div><div class="grp">${grpCards}</div></div>
+    <div class="sec two">
+     <div><div class="st">Uji Benford's Law <small>${b.n} nominal</small></div>
+      <div class="bf">${b.d.map(x=>`<div><div class="o${x.z>1.96?' z':''}" style="height:${100*x.o/bmx}%"></div><div class="e" style="bottom:${100*x.e/bmx}%"></div></div>`).join('')}</div>
+      <div class="bfx">${b.d.map(x=>`<span>${x.k}</span>`).join('')}</div>
+      <p style="margin:8px 0 0;font-size:9px">Batang = proporsi aktual digit pertama; garis putus-putus = harapan Benford; merah = berbeda signifikan. Kesimpulan: <b>${conf}</b> (MAD ${b.mad.toFixed(4).replace('.',',')}).</p></div>
+     <div><div class="st">Metodologi singkat</div>
+      <p style="margin:0 0 6px;font-size:9px">Seluruh populasi transaksi diuji dengan ${RULES.filter(r=>cfg.on[r.id]).length} aturan pola (transaction, behavioral, anomaly). Setiap aturan memiliki bobot; skor risiko adalah jumlah bobot aturan yang terpicu (maks. 100).</p>
+      <table><colgroup><col><col style="width:118px"></colgroup><tbody><tr><td>Batas otorisasi</td><td class="r">${rps(cfg.threshold)}</td></tr><tr><td>Jam kerja</td><td class="r">${p2(cfg.hStart)}:00–${p2(cfg.hEnd)}:00</td></tr><tr><td>Jendela duplikat</td><td class="r">${cfg.dupDays} hari</td></tr><tr><td>Ambang outlier (robust z)</td><td class="r">${String(cfg.zThr).replace('.',',')}</td></tr><tr><td>Tingkat risiko</td><td class="r">≥50 · 25–49 · 1–24</td></tr></tbody></table></div>
+    </div>
+    <div class="sec"><div class="st">Rekomendasi tindak lanjut</div><ol class="rec">${recs||'<li>Tidak ada pola yang memerlukan tindak lanjut.</li>'}</ol></div>
+    <div class="sec note"><b>Catatan:</b> pola abnormal adalah indikasi untuk investigasi, bukan bukti fraud. Setiap temuan tetap memerlukan validasi, korroborasi dokumen, dan professional judgment sebelum disimpulkan.</div>
+    <div class="sign"><div>Disiapkan oleh<br>Internal Audit</div><div>Diketahui oleh<br>&nbsp;</div></div>
+   </div>${ft(2)}</div>`;
+  const app=chunks.map(([i0,a],k)=>`<div class="pg">${strip('Lampiran: daftar temuan')}<div class="in"><div class="sec"><div class="st">Daftar temuan lanjutan <small>No. ${i0+1}–${i0+a.length} dari ${fl.length}</small></div><table>${colg}${head}<tbody>${rows(a,i0)}</tbody></table></div></div>${ft(3+k)}</div>`).join('');
+  return {html:page1+page2+app,n:N};
+}
+const PDF_LIBS=['https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js','https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'];
+function loadScript(src){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>no(new Error('Pustaka PDF gagal dimuat. Periksa koneksi internet, atau gunakan tombol Cetak lalu pilih "Save as PDF".'));document.head.appendChild(s)})}
+async function pdfLibs(){if(!window.html2canvas)await loadScript(PDF_LIBS[0]);if(!(window.jspdf&&window.jspdf.jsPDF))await loadScript(PDF_LIBS[1])}
+function rpFit(){const p=$('#rpPages');if(p)p.style.zoom=Math.min(1,(window.innerWidth-32)/794)}
+function closeReport(){const m=$('#rpModal');if(m){m.hidden=true;m.innerHTML=''}document.body.style.overflow=''}
+function openReport(){
+  const {html,n}=reportPages();let m=$('#rpModal');
+  if(!m){m=document.createElement('div');m.id='rpModal';m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');m.setAttribute('aria-label','Pratinjau laporan pimpinan');document.body.appendChild(m)}
+  m.innerHTML=`<div class="rp-bar"><div><h3>Pratinjau laporan pimpinan</h3><div class="small muted">A4 · ${n} halaman · ${esc(S.src)}</div></div><div class="row"><button class="btn pri" id="rpPdf">Unduh PDF</button><button class="btn" id="rpPrint">Cetak</button><button class="btn" id="rpClose">Tutup</button></div></div><div class="rp-pages" id="rpPages">${html}</div>`;
+  m.hidden=false;m.scrollTop=0;document.body.style.overflow='hidden';rpFit();
+  $('#rpClose').onclick=closeReport;$('#rpPrint').onclick=()=>window.print();$('#rpPdf').onclick=e=>downloadPdf(e.currentTarget);$('#rpPdf').focus();
+}
+async function downloadPdf(btn){
+  const wrap=$('#rpPages'),z=wrap.style.zoom,lbl=btn.textContent;btn.disabled=true;btn.textContent='Menyiapkan…';
+  try{
+    await pdfLibs();if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+    wrap.style.zoom=1;const pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4',orientation:'portrait',compress:true});
+    const pages=[...wrap.querySelectorAll('.pg')];
+    for(let i=0;i<pages.length;i++){btn.textContent=`Membuat PDF ${i+1}/${pages.length}…`;
+      const c=await html2canvas(pages[i],{scale:2,useCORS:true,backgroundColor:'#FFFFFF',logging:false});
+      if(i)pdf.addPage();pdf.addImage(c.toDataURL('image/jpeg',0.92),'JPEG',0,0,210,297,undefined,'FAST')}
+    pdf.setProperties({title:'Laporan Hasil Pattern Recognition',subject:'Internal Audit · InJourney Aviation Services',creator:'INSIGHT Pattern Recognition'});
+    const fn=`Laporan-Pimpinan-Pattern-Recognition-${today()}.pdf`;pdf.save(fn);toast('PDF diunduh: '+fn);
+  }catch(e){toast(e&&e.name==='SecurityError'?'PDF tidak bisa dibuat saat aplikasi dibuka sebagai file lokal. Klik Cetak lalu pilih "Save as PDF", atau buka aplikasi lewat situs web.':(e&&e.message)||'PDF gagal dibuat. Coba tombol Cetak lalu pilih "Save as PDF".',true)}
+  finally{wrap.style.zoom=z;btn.disabled=false;btn.textContent=lbl}
+}
+window.addEventListener('resize',()=>{const m=$('#rpModal');if(m&&!m.hidden)rpFit()});
+window.addEventListener('keydown',e=>{const m=$('#rpModal');if(e.key==='Escape'&&m&&!m.hidden)closeReport()});
+
 function copyText(txt,target){const done=ok=>{const el=$(target);if(el)el.innerHTML=ok?'<span class="msg ok">Tersalin ke clipboard.</span>':`<p class="small muted">Clipboard tidak tersedia. Salin manual:</p><textarea readonly>${esc(txt)}</textarea>`;if(!ok){const ta=el&&el.querySelector('textarea');if(ta){ta.focus();ta.select()}}};
   try{navigator.clipboard.writeText(txt).then(()=>done(true),()=>done(false))}catch(e){done(false)}}
 
 function bind(v){
   const ex=$('#expXlsx');if(ex)ex.onclick=exportReport;
+  const ep=$('#expPdf');if(ep)ep.onclick=openReport;
   if(v==='temuan'){
     const upd=()=>{S.f={lv:$('#fLv').value,rule:$('#fRule').value,st:$('#fSt').value,q:$('#fQ').value};const pos=$('#fQ').selectionStart;render();if(document.activeElement!==$('#fQ')&&S._q){$('#fQ').focus();$('#fQ').setSelectionRange(pos,pos)}};
     ['#fLv','#fRule','#fSt'].forEach(s=>$(s).onchange=upd);$('#fQ').oninput=()=>{S._q=true;upd();S._q=false};
