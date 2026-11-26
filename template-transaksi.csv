@@ -1,0 +1,32 @@
+﻿id;tanggal;jam;vendor;jumlah;pembuat;penyetuju;kategori;keterangan
+TRX-001;2026-11-02;09:15;PT Sinar Abadi;18750000;ANDI;RINA;Pengadaan;Pembelian material bangunan
+TRX-002;2026-11-02;10:40;PT Data Prima;32400000;DEWI;HADI;Jasa IT;Maintenance server bulanan
+TRX-003;2026-11-03;10:12;PT Sinar Abadi;49000000;BUDI;HADI;Pengadaan;Pembelian material
+TRX-004;2026-11-03;14:47;PT Sinar Abadi;49000000;BUDI;HADI;Pengadaan;Pembelian material
+TRX-005;2026-11-04;08:55;PT Logistik Nusantara;12300000;CITRA;RINA;Logistik;Biaya pengiriman batch 101
+TRX-006;2026-11-04;13:20;PT Karya Mandiri;15000000;CITRA;RINA;Pengadaan;Pembelian peralatan kerja
+TRX-007;2026-11-05;11:30;CV Berkah Sentosa;2475000;EKO;HADI;ATK;Pembelian kertas dan tinta
+TRX-008;2026-11-06;09:05;CV Mitra Usaha;24500000;EKO;HADI;Pemeliharaan;Perbaikan AC lantai 3
+TRX-009;2026-11-06;09:41;CV Mitra Usaha;19800000;EKO;HADI;Pemeliharaan;Perbaikan AC lantai 3
+TRX-010;2026-11-06;10:16;CV Mitra Usaha;22300000;EKO;HADI;Pemeliharaan;Perbaikan AC lantai 3
+TRX-011;2026-11-08;21:40;PT Global Supplies;12750000;EKO;EKO;ATK;Pembelian ATK
+TRX-012;2026-11-09;10:02;PT Teknologi Andalan;37850000;CITRA;RINA;Jasa IT;Lisensi software Q4
+TRX-013;2026-11-11;15:40;PT Teknologi Andalan;37850000;CITRA;RINA;Jasa IT;Lisensi software Q4
+TRX-014;2026-11-12;02:15;CV Berkah Sentosa;4150000;ANDI;HADI;ATK;Pembelian ATK
+TRX-015;2026-11-12;11:00;PT Logistik Nusantara;14900000;ANDI;HADI;Logistik;Biaya pengiriman batch 102
+TRX-016;2026-11-13;09:30;PT Wira Konsultindo;150000000;ANDI;RINA;Konsultan;Jasa konsultan restrukturisasi
+TRX-017;2026-11-16;11:45;PT Karya Mandiri;33000000;BUDI;BUDI;Pengadaan;Pembelian material
+TRX-018;2026-11-17;14:10;CV Berkah Sentosa;3320000;CITRA;RINA;ATK;Pembelian map dan binder
+TRX-019;2026-11-18;10:20;CV Berkah Sentosa;145000000;CITRA;RINA;ATK;Pembelian ATK
+TRX-020;2026-11-19;13:00;PT Data Prima;41300000;DEWI;RINA;Jasa IT;Jasa pengembangan sistem
+TRX-021;2026-11-21;10:05;PT Data Prima;46800000;DEWI;RINA;Jasa IT;Jasa pengembangan sistem
+TRX-022;2026-11-23;11:11;CV Maju Jaya;8760000;EKO;RINA;Pemeliharaan;Pemeliharaan genset
+TRX-023;2026-11-24;08:50;CV Maju Jaya;8760000;EKO;RINA;Pemeliharaan;Pemeliharaan genset
+TRX-024;2026-11-24;15:30;PT Data Prima;28650000;DEWI;HADI;Jasa IT;Maintenance server bulanan
+TRX-025;2026-11-25;10:45;PT Data Prima;35200000;DEWI;HADI;Jasa IT;Pengembangan aplikasi
+TRX-026;2026-11-26;09:20;CV Berkah Sentosa;2980000;BUDI;HADI;ATK;Pembelian kertas dan tinta
+TRX-027;2026-11-26;23:05;PT Teknologi Andalan;47900000;CITRA;RINA;Jasa IT;Perpanjangan lisensi
+TRX-028;2026-11-27;09:00;PT Logistik Nusantara;16200000;BUDI;HADI;Logistik;Biaya pengiriman batch 103
+TRX-029;2026-11-27;15:10;PT Logistik Nusantara;1850000000;ANDI;HADI;Logistik;Biaya pengiriman proyek
+TRX-030;2026-11-30;10:30;PT Logistik Nusantara;11750000;CITRA;RINA;Logistik;Biaya pengiriman batch 104
+TRX-031;2026-11-30;11:15;CV Berkah Sentosa;1850000;EKO;HADI;ATK;Pembelian alat tulis

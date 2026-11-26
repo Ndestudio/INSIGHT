@@ -26,16 +26,34 @@ Aplikasi web satu halaman untuk Internal Audit InJourney Aviation Services. Apli
 
 Kolom wajib: `tanggal`, `vendor`, `jumlah`. Opsional: `id`, `jam`, `pembuat`, `penyetuju`, `kategori`, `keterangan`.
 
-```csv
-id,tanggal,jam,vendor,jumlah,pembuat,penyetuju,kategori,keterangan
-TRX001,2026-11-03,10:12,PT Sinar Abadi,49000000,BUDI,HADI,Pengadaan,Pembelian material
-```
+Pemisah kolom boleh koma, titik koma, atau tab. Tanggal `YYYY-MM-DD` atau `DD/MM/YYYY`. Nominal boleh `49000000` atau `49.000.000`.
+
+### Template siap pakai
+
+[`template-transaksi.csv`](template-transaksi.csv) berisi 31 transaksi contoh (fiktif) yang memicu kesembilan aturan. File ini memakai pemisah titik koma dan UTF-8 sehingga langsung terbuka rapi di Excel berbahasa Indonesia. Tombol **Unduh template CSV** juga tersedia di menu Sumber Data aplikasi.
+
+| Baris contoh | Pola yang diperagakan |
+|---|---|
+| TRX-003, TRX-004 | Duplicate payment + split transaction + mendekati batas (2 × Rp49 jt, hari sama) |
+| TRX-008 s.d. TRX-010 | Split transaction (3 transaksi perbaikan AC di hari sama, total Rp66,6 jt) |
+| TRX-012/013, TRX-022/023 | Duplicate payment (vendor & nominal sama dalam 1–2 hari) |
+| TRX-011 | Weekend + di luar jam kerja + pembuat = penyetuju |
+| TRX-017 | Pembuat = penyetuju |
+| TRX-014, TRX-027 | Di luar jam kerja (02:15, 23:05) |
+| TRX-021 | Weekend + mendekati batas otorisasi |
+| TRX-006, TRX-016 | Round amount (Rp15 jt, Rp150 jt) |
+| TRX-019, TRX-029 | Outlier nominal dibanding kategorinya |
+| TRX-002, 020, 021, 024, 025 | Vendor favorit (semua transaksi DEWI ke PT Data Prima) |
+| Baris lainnya | Transaksi normal sebagai pembanding |
+
+Cara pakai: buka template di Excel, hapus baris contoh, isi data Anda dengan kolom yang sama, lalu **Save As → CSV (Comma delimited)** atau CSV UTF-8, dan unggah di menu Sumber Data.
 
 ## Struktur file
 
 | File | Isi |
 |---|---|
 | `index.html` | Seluruh aplikasi (HTML, CSS, JavaScript) |
+| `template-transaksi.csv` | Template unggah CSV berisi 31 transaksi contoh |
 | `ias-logo-white.png` | Logo IAS versi putih |
 | `hero-globe.jpg` | Gambar globe untuk header |
 

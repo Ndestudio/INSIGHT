@@ -516,11 +516,12 @@ function vData(){
   ${m?`<div class="msg ${m.t}">${esc(m.s)}</div>`:''}
   <div class="grid g2">
    <div class="panel"><h3>Muat data</h3><p class="sub">Sumber aktif: ${esc(S.src)}</p>
-    <div class="row"><label class="btn pri" for="fileIn">Unggah CSV</label><input type="file" id="fileIn" accept=".csv,.txt,text/csv" hidden><button class="btn" id="loadSample">Muat data contoh</button></div>
+    <div class="row"><label class="btn pri" for="fileIn">Unggah CSV</label><input type="file" id="fileIn" accept=".csv,.txt,text/csv" hidden><button class="btn" id="loadSample">Muat data contoh</button><a class="btn" href="template-transaksi.csv" download="template-transaksi.csv">Unduh template CSV</a></div>
+    <p class="small muted" style="margin:10px 0 0">Template berisi 31 transaksi contoh (pemisah titik koma, bisa dibuka di Excel). Ganti isinya dengan data Anda, simpan sebagai CSV, lalu unggah.</p>
     <p class="small muted" style="margin:14px 0 6px">Atau tempel isi CSV di sini:</p><textarea id="pasteIn" placeholder="${esc(TEMPLATE.split('\n')[0])}"></textarea>
     <div class="row" style="margin-top:8px"><button class="btn" id="parsePaste">Proses teks</button></div></div>
    <div class="panel"><h3>Format kolom</h3><p class="sub">Wajib: <b>tanggal</b>, <b>vendor</b>, <b>jumlah</b>. Opsional: id, jam, pembuat, penyetuju, kategori, keterangan. Pemisah koma, titik koma, atau tab. Tanggal YYYY-MM-DD atau DD/MM/YYYY; nominal boleh "49.000.000".</p>
-    <pre class="code" id="tpl">${esc(TEMPLATE)}</pre><div class="row" style="margin-top:8px"><button class="btn" id="copyTpl">Salin template</button><span id="tplMsg" class="small muted"></span></div>
+    <pre class="code" id="tpl">${esc(TEMPLATE)}</pre><div class="row" style="margin-top:8px"><button class="btn" id="copyTpl">Salin template</button><a class="btn" href="template-transaksi.csv" download="template-transaksi.csv">Unduh template CSV</a><span id="tplMsg" class="small muted"></span></div>
     <p class="small muted">Nama kolom alternatif dikenali, misalnya amount/nominal, date/tgl, supplier, maker/user, approver/checker, category/akun.</p></div>
   </div>
   <div class="panel"><h3>Pratinjau data</h3><p class="sub">50 baris pertama dari ${S.tx.length} transaksi.</p><div class="tw" style="max-height:420px"><table><thead><tr><th>ID</th><th>Tanggal</th><th>Jam</th><th>Vendor</th><th class="r">Jumlah</th><th>Pembuat</th><th>Penyetuju</th><th>Kategori</th><th>Keterangan</th></tr></thead><tbody>
